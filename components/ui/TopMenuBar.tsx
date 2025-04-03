@@ -105,16 +105,16 @@ const TopMenuBar = () => {
           {/* Logo - positioned at extreme left */}
           <div className="flex-shrink-0">
             <Link href="/" className="flex items-center">
-              {/* <Image
-                src="/images/logo.png"
+              <Image
+                src="/images/logo-horizontal.png"
                 alt="Logo"
-                width={192}
-                height={48}
-                className="h-8 w-auto relative top-px"
-              /> */}
-              <span className="ml-3 text-lg font-semibold text-gray-700">
+                width={1024}
+                height={1024}
+                className="h-34 w-auto"
+              />
+              {/* <span className="ml-3 text-lg font-semibold text-gray-700">
                 Social Lobby App
-              </span>
+              </span> */}
             </Link>
           </div>
 

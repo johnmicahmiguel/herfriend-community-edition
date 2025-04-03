@@ -8,10 +8,10 @@ export default function LoadingScreen() {
         {/* UNICEF Logo */}
         <div className="w-48 h-24 relative mb-8">
           <Image
-            src="/images/logo2.png"
+            src="/images/logo-horizontal.png"
             alt="Social App Logo"
-            width={192}
-            height={48}
+            width={1024}
+            height={1024}
             priority
             className="object-contain"
           />
