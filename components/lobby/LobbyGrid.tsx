@@ -102,7 +102,7 @@ const NavigationButton = memo(
   }) => (
     <button
       onClick={() => onClick()}
-      className={`absolute ${direction === "left" ? "left-0" : "right-0"} top-1/2 -translate-y-1/2 z-10 bg-white/80 rounded-full p-2 shadow-md hover:bg-unicef hover:text-white ${
+      className={`absolute ${direction === "left" ? "left-0" : "right-0"} top-1/2 -translate-y-1/2 z-10 bg-white/80 rounded-full p-2 shadow-md hover:bg-blue-500 hover:text-white ${
         disabled ? "opacity-0" : "opacity-100"
       }`}
       aria-label={`Scroll ${direction}`}

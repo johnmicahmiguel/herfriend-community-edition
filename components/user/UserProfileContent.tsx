@@ -47,7 +47,7 @@ export default function UserProfileContent({ user, className = "" }: UserProfile
       <div className="p-6 pb-2">
         <div className="flex items-center gap-4">
           <div className="relative">
-            <div className={`w-20 h-20 rounded-full overflow-hidden border-2 ${user.online ? 'border-unicef' : 'border-gray-300'}`}>
+            <div className={`w-20 h-20 rounded-full overflow-hidden border-2 ${user.online ? 'border-blue-500' : 'border-gray-300'}`}>
               <Image
                 src={user.avatar}
                 alt={user.name}
@@ -57,7 +57,7 @@ export default function UserProfileContent({ user, className = "" }: UserProfile
               />
             </div>
             {user.online && (
-              <div className="absolute bottom-0 right-0 bg-unicef text-white p-1 rounded-full">
+              <div className="absolute bottom-0 right-0 bg-blue-500 text-white p-1 rounded-full">
                 <span className="block w-2 h-2 rounded-full" />
               </div>
             )}
@@ -79,7 +79,7 @@ export default function UserProfileContent({ user, className = "" }: UserProfile
         </div>
 
         <div className="mt-4 flex gap-2">
-          <button className="flex-1 bg-unicef text-white px-4 py-2 rounded-full text-sm font-medium flex items-center justify-center gap-1">
+          <button className="flex-1 bg-blue-500 text-white px-4 py-2 rounded-full text-sm font-medium flex items-center justify-center gap-1">
             <UserPlus size={16} />
             Follow
           </button>
@@ -95,12 +95,12 @@ export default function UserProfileContent({ user, className = "" }: UserProfile
           <div className="flex gap-3 mt-4 justify-center">
             {user.socialMedia.instagram && (
               <a href={user.socialMedia.instagram} className="text-gray-600 hover:text-pink-600" target="_blank" rel="noopener noreferrer">
-                <FaInstagram size={20} className="text-unicef cursor-pointer" />
+                <FaInstagram size={20} className="text-blue-500 cursor-pointer" />
               </a>
             )}
             {user.socialMedia.twitter && (
-              <a href={user.socialMedia.twitter} className="text-gray-600 hover:text-unicef" target="_blank" rel="noopener noreferrer">
-                <FaTwitter size={20} className="text-unicef cursor-pointer" />
+              <a href={user.socialMedia.twitter} className="text-gray-600 hover:text-blue-500" target="_blank" rel="noopener noreferrer">
+                <FaTwitter size={20} className="text-blue-500 cursor-pointer" />
               </a>
             )}
           </div>
@@ -117,19 +117,19 @@ export default function UserProfileContent({ user, className = "" }: UserProfile
         <Tabs.List className="flex border-b border-gray-200">
           <Tabs.Trigger
             value="posts"
-            className={`flex-1 py-3 text-sm font-medium ${activeTab === "posts" ? "text-unicef border-b-2 border-unicef relative -mb-[2px]" : "text-gray-600"}`}
+            className={`flex-1 py-3 text-sm font-medium ${activeTab === "posts" ? "text-blue-500 border-b-2 border-blue-500 relative -mb-[2px]" : "text-gray-600"}`}
           >
             Posts
           </Tabs.Trigger>
           <Tabs.Trigger
             value="services"
-            className={`flex-1 py-3 text-sm font-medium ${activeTab === "services" ? "text-unicef border-b-2 border-unicef relative -mb-[2px]" : "text-gray-600"}`}
+            className={`flex-1 py-3 text-sm font-medium ${activeTab === "services" ? "text-blue-500 border-b-2 border-blue-500 relative -mb-[2px]" : "text-gray-600"}`}
           >
             Services
           </Tabs.Trigger>
           <Tabs.Trigger
             value="about"
-            className={`flex-1 py-3 text-sm font-medium ${activeTab === "about" ? "text-unicef border-b-2 border-unicef relative -mb-[2px]" : "text-gray-600"}`}
+            className={`flex-1 py-3 text-sm font-medium ${activeTab === "about" ? "text-blue-500 border-b-2 border-blue-500 relative -mb-[2px]" : "text-gray-600"}`}
           >
             About
           </Tabs.Trigger>
@@ -182,10 +182,10 @@ export default function UserProfileContent({ user, className = "" }: UserProfile
                 <div key={index} className="border border-gray-200 rounded-lg p-4">
                   <div className="flex justify-between items-start">
                     <h3 className="font-medium">{service.title}</h3>
-                    <span className="text-unicef font-semibold">{service.price}</span>
+                    <span className="text-blue-500 font-semibold">{service.price}</span>
                   </div>
                   <p className="text-sm text-gray-600 mt-2">{service.description}</p>
-                  <button className="mt-3 w-full bg-unicef text-white py-2 rounded-lg text-sm font-medium">
+                  <button className="mt-3 w-full bg-blue-500 text-white py-2 rounded-lg text-sm font-medium">
                     Book Now
                   </button>
                 </div>

@@ -182,7 +182,7 @@ const MessagePanel: React.FC<MessagePanelProps> = ({ open, onClose }) => {
           >
             <div className="flex flex-col h-full">
               <div className="flex items-center justify-between p-4 border-b">
-                <h2 className="text-lg font-semibold text-unicef">Messages</h2>
+                <h2 className="text-lg font-semibold text-blue-500">Messages</h2>
                 <button
                   onClick={onClose}
                   className="p-2 rounded-full hover:bg-gray-100"
@@ -217,14 +217,14 @@ const MessagePanel: React.FC<MessagePanelProps> = ({ open, onClose }) => {
         <div className="flex flex-col h-full">
           {/* Header */}
           <div className="flex items-center justify-between p-4 border-b">
-            <h2 className="text-lg font-semibold text-unicef">
+            <h2 className="text-lg font-semibold text-blue-500">
               {selectedThread ? "Message" : "Messages"}
             </h2>
             <div className="flex items-center space-x-2">
               {!selectedThread && !showSearch && (
                 <button
                   onClick={() => setShowSearch(true)}
-                  className="p-2 text-gray-600 hover:text-unicef rounded-full hover:bg-gray-100"
+                  className="p-2 text-gray-600 hover:text-blue-500 rounded-full hover:bg-gray-100"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"

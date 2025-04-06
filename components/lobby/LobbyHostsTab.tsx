@@ -31,7 +31,7 @@ export default function LobbyHostsTab({
       <div className="flex flex-col md:flex-row">
         {/* Header with minimize/expand button for mobile */}
         <div className="p-4 pb-0 md:hidden flex items-center justify-between">
-          <h3 className="text-sm font-medium text-unicef">Hosts</h3>
+          <h3 className="text-sm font-medium text-blue-500">Hosts</h3>
           <button
             onClick={() => setCoHostsMinimized(!coHostsMinimized)}
             className="text-blue-600 text-xs flex items-center"
@@ -54,7 +54,7 @@ export default function LobbyHostsTab({
           <div className="flex items-start">
             <div className="relative mr-3">
               {/* Avatar with speaking indicator */}
-              <div className={`w-14 h-14 rounded-full overflow-hidden ${speakingUser === lobbyData.hostName ? 'ring-2 ring-unicef ring-offset-2' : ''}`}>
+              <div className={`w-14 h-14 rounded-full overflow-hidden ${speakingUser === lobbyData.hostName ? 'ring-2 ring-blue-500 ring-offset-2' : ''}`}>
                 <Image
                   src={lobbyData.hostAvatar}
                   alt={lobbyData.hostName}
@@ -64,15 +64,15 @@ export default function LobbyHostsTab({
                 />
               </div>
               {/* Online status indicator */}
-              <span className="absolute bottom-0 right-0 bg-unicef text-white p-1 rounded-full">
+              <span className="absolute bottom-0 right-0 bg-blue-500 text-white p-1 rounded-full">
                 <Star size={10} />
               </span>
               {/* Speaking indicator */}
               {speakingUser === lobbyData.hostName && (
                 <div className="absolute -top-1 -right-1 bg-white rounded-full p-0.5 shadow-sm">
                   <div className="relative">
-                    <Mic size={12} className="text-unicef" />
-                    <span className="absolute -top-1 -right-1 w-2 h-2 bg-unicef rounded-full animate-pulse"></span>
+                    <Mic size={12} className="text-blue-500" />
+                    <span className="absolute -top-1 -right-1 w-2 h-2 bg-blue-500 rounded-full animate-pulse"></span>
                   </div>
                 </div>
               )}
@@ -97,10 +97,10 @@ export default function LobbyHostsTab({
 
               <div className="flex items-center justify-between">
                 <div className="flex space-x-2">
-                  <button className="bg-unicef text-white p-2 rounded-full flex items-center justify-center w-10 h-10 shadow-sm hover:shadow transition-all">
+                  <button className="bg-blue-500 text-white p-2 rounded-full flex items-center justify-center w-10 h-10 shadow-sm hover:shadow transition-all">
                     <Gift size={18} className="cursor-pointer" />
                   </button>
-                  <button className="bg-blue-100 text-unicef px-3 py-2 rounded-full text-sm font-medium shadow-sm hover:shadow transition-all cursor-pointer">
+                  <button className="bg-blue-100 text-blue-500 px-3 py-2 rounded-full text-sm font-medium shadow-sm hover:shadow transition-all cursor-pointer">
                     Book
                   </button>
                 </div>
@@ -129,13 +129,13 @@ export default function LobbyHostsTab({
                         >
                           <X size={16} />
                         </button>
-                        <h4 className="text-sm font-medium text-unicef mb-2 pr-4">Lobby Goals</h4> {/* Added pr-4 for spacing */}
+                        <h4 className="text-sm font-medium text-blue-500 mb-2 pr-4">Lobby Goals</h4> {/* Added pr-4 for spacing */}
                         <div className="space-y-2">
                           <div className="flex items-center">
                             <div className="h-2 w-full bg-gray-200 rounded-full overflow-hidden">
-                              <div className="h-full bg-unicef rounded-full" style={{ width: '65%' }}></div>
+                              <div className="h-full bg-blue-500 rounded-full" style={{ width: '65%' }}></div>
                             </div>
-                            <span className="ml-2 text-xs font-medium text-unicef">65%</span>
+                            <span className="ml-2 text-xs font-medium text-blue-500">65%</span>
                           </div>
                           <p className="text-xs text-gray-600">Help us reach our goal of 10,000 participants!</p>
                           <div className="flex items-center justify-between text-xs">
@@ -186,7 +186,7 @@ export default function LobbyHostsTab({
 
         {/* Right side - Co-hosts - completely hidden on mobile when minimized */}
         <div className={`md:w-1/2 p-4 ${coHostsMinimized ? 'hidden md:block' : 'block'}`}>
-          <h3 className="text-sm font-medium text-unicef mb-3">Co-hosts</h3>
+          <h3 className="text-sm font-medium text-blue-500 mb-3">Co-hosts</h3>
 
           {/* Content */}
           <div className="flex items-center space-x-3 mt-1">
@@ -198,7 +198,7 @@ export default function LobbyHostsTab({
                 onClick={() => handleCoHostClick(host.id)}
               >
                 {/* Avatar - make it clickable */}
-                <div className={`w-14 h-14 rounded-full overflow-hidden border-2 ${host.online ? 'border-unicef' : 'border-gray-300'} ${speakingUser === host.name ? 'ring-2 ring-unicef ring-offset-1' : ''} ${!host.online ? 'grayscale opacity-75' : ''} cursor-pointer`}>
+                <div className={`w-14 h-14 rounded-full overflow-hidden border-2 ${host.online ? 'border-blue-500' : 'border-gray-300'} ${speakingUser === host.name ? 'ring-2 ring-blue-500 ring-offset-1' : ''} ${!host.online ? 'grayscale opacity-75' : ''} cursor-pointer`}>
                   <Image
                     src={host.avatar}
                     alt={host.name}
@@ -212,8 +212,8 @@ export default function LobbyHostsTab({
                 {speakingUser === host.name && host.online && (
                   <div className="absolute -top-1 -right-1 bg-white rounded-full p-0.5 shadow-sm">
                     <div className="relative">
-                      <Mic size={10} className="text-unicef" />
-                      <span className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 bg-unicef rounded-full animate-pulse"></span>
+                      <Mic size={10} className="text-blue-500" />
+                      <span className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 bg-blue-500 rounded-full animate-pulse"></span>
                     </div>
                   </div>
                 )}
@@ -236,10 +236,10 @@ export default function LobbyHostsTab({
                     </div>
                     <p className="text-xs text-gray-600 mb-1">{host.specialty}</p>
                     <div className="flex justify-center gap-1 mt-1">
-                      <button className={`${host.online ? 'bg-unicef text-white' : 'bg-gray-200 text-gray-500'} p-1 rounded-full`}>
+                      <button className={`${host.online ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-500'} p-1 rounded-full`}>
                         <Gift size={12} className="cursor-pointer" />
                       </button>
-                      <button className={`${host.online ? 'bg-blue-100 text-unicef' : 'bg-gray-200 text-gray-500'} px-2 py-0.5 rounded-full text-xs cursor-pointer`}>
+                      <button className={`${host.online ? 'bg-blue-100 text-blue-500' : 'bg-gray-200 text-gray-500'} px-2 py-0.5 rounded-full text-xs cursor-pointer`}>
                         Book
                       </button>
                     </div>
@@ -282,13 +282,13 @@ export default function LobbyHostsTab({
               >
                 <X size={16} />
               </button>
-              <h4 className="text-sm font-medium text-unicef mb-2 pr-4">Lobby Goals</h4> {/* Added pr-4 for spacing */}
+              <h4 className="text-sm font-medium text-blue-500 mb-2 pr-4">Lobby Goals</h4> {/* Added pr-4 for spacing */}
               <div className="space-y-2">
                 <div className="flex items-center">
                   <div className="h-2 w-full bg-gray-200 rounded-full overflow-hidden">
-                    <div className="h-full bg-unicef rounded-full" style={{ width: '65%' }}></div>
+                    <div className="h-full bg-blue-500 rounded-full" style={{ width: '65%' }}></div>
                   </div>
-                  <span className="ml-2 text-xs font-medium text-unicef">65%</span>
+                  <span className="ml-2 text-xs font-medium text-blue-500">65%</span>
                 </div>
                 <p className="text-xs text-gray-600">Help us reach our goal of 10,000 participants!</p>
                 <div className="flex items-center justify-between text-xs">

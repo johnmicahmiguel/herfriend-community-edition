@@ -255,7 +255,7 @@ export default function LobbyPage() {
       <div className="md:hidden fixed top-20 right-4 z-10">
         <button 
           onClick={() => setShowMobileSidebar(true)}
-          className="bg-unicef text-white rounded-full p-2 shadow-lg hover:shadow-xl transition-shadow" 
+          className="bg-blue-500 text-white rounded-full p-2 shadow-lg hover:shadow-xl transition-shadow" 
           aria-label="View Top Users"
         >
           <Users size={18} />

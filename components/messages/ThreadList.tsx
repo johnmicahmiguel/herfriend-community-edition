@@ -40,7 +40,7 @@ const ThreadItem: React.FC<{
 
         {/* Unread indicator */}
         {thread.unreadCount > 0 && (
-          <div className="absolute -top-1 -right-1 flex items-center justify-center w-5 h-5 bg-unicef text-white text-xs font-bold rounded-full">
+          <div className="absolute -top-1 -right-1 flex items-center justify-center w-5 h-5 bg-blue-500 text-white text-xs font-bold rounded-full">
             {thread.unreadCount > 9 ? "9+" : thread.unreadCount}
           </div>
         )}
@@ -78,7 +78,7 @@ const ThreadList: React.FC<ThreadListProps> = ({
       <div className="flex flex-col h-full">
         <div className="flex-1 overflow-y-auto">
           <div className="flex justify-center items-center h-full">
-            <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-unicef"></div>
+            <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
           </div>
         </div>
       </div>

@@ -21,7 +21,7 @@ export default function ProtectedLayout({
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="text-unicef text-xl">Loading...</div>
+        <div className="text-blue-500 text-xl">Loading...</div>
       </div>
     );
   }

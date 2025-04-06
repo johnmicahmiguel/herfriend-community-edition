@@ -48,7 +48,7 @@ function LobbyCard({ lobby, preventNavigation = false }: LobbyCardProps) {
         </div>
 
         {isLive && (
-          <div className="absolute top-3 left-3 bg-unicef text-white text-sm px-3 py-1 rounded-full">
+          <div className="absolute top-3 left-3 bg-blue-500 text-white text-sm px-3 py-1 rounded-full">
             LIVE
           </div>
         )}

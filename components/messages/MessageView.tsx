@@ -41,7 +41,7 @@ const MessageInput: React.FC<{
           value={message}
           onChange={(e) => setMessage(e.target.value)}
           placeholder="Type a message..."
-          className="flex-1 py-2 px-3 bg-gray-100 rounded-full text-sm focus:outline-none focus:ring-1 focus:ring-unicef"
+          className="flex-1 py-2 px-3 bg-gray-100 rounded-full text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
           onKeyDown={(e) => {
             if (e.key === "Enter" && !e.shiftKey) {
               e.preventDefault();
@@ -54,7 +54,7 @@ const MessageInput: React.FC<{
           disabled={!message.trim() || isSending}
           className={`p-2 rounded-full ${
             message.trim() && !isSending
-              ? "bg-unicef text-white"
+              ? "bg-blue-500 text-white"
               : "bg-gray-200 text-gray-400"
           }`}
         >
@@ -84,7 +84,7 @@ const MessageBubble: React.FC<{
       <div
         className={`max-w-[80%] px-3 py-2 rounded-lg ${
           isCurrentUser
-            ? "bg-unicef text-white rounded-tr-none"
+            ? "bg-blue-500 text-white rounded-tr-none"
             : "bg-gray-100 text-gray-800 rounded-tl-none"
         }`}
       >
@@ -278,7 +278,7 @@ const MessageView: React.FC<MessageViewProps> = ({
           <div className="p-4">
             {isLoading ? (
               <div className="flex justify-center items-center h-40">
-                <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-unicef"></div>
+                <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
               </div>
             ) : messageGroups.length === 0 ? (
               <div className="flex flex-col justify-center items-center h-40 text-center">

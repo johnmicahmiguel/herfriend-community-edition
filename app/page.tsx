@@ -11,7 +11,7 @@ export default function HomePage() {
 
       {/* Lobby grid */}
       <div className="p-4 md:p-6 w-full overflow-hidden">
-        <h2 className="text-lg font-bold mb-4 text-unicef">Popular Lobbies</h2>
+        <h2 className="text-lg font-bold mb-4 text-blue-500 dark:text-gray-200">Popular Lobbies</h2>
         <LobbyGrid />
       </div>
     </>

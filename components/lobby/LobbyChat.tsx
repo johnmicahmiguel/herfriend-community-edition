@@ -46,9 +46,9 @@ export default function LobbyChat({ chatMessages }: LobbyChatProps) {
           <input 
             type="text" 
             placeholder="Type a message..." 
-            className="flex-1 text-xs md:text-sm border border-blue-200 rounded-full px-3 py-1.5 md:px-4 md:py-2 focus:outline-none focus:border-unicef focus:ring-1 focus:ring-unicef bg-white"
+            className="flex-1 text-xs md:text-sm border border-blue-200 rounded-full px-3 py-1.5 md:px-4 md:py-2 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 bg-white"
           />
-          <button className="bg-unicef text-white p-1.5 md:p-2 rounded-full ml-2 shadow-sm hover:shadow transition-all">
+          <button className="bg-blue-500 text-white p-1.5 md:p-2 rounded-full ml-2 shadow-sm hover:shadow transition-all">
             <ChevronRight size={16} className="md:hidden" />
             <ChevronRight size={18} className="hidden md:block" />
           </button>

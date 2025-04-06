@@ -36,7 +36,7 @@ export default function LobbySidebar({ topUsers, isMobile = false, onClose }: Lo
                 </div>
                 <div className="flex-1 flex justify-between items-center">
                   <span className="text-sm">{user.name}</span>
-                  <span className="text-sm text-unicef font-medium">{user.amount}</span>
+                  <span className="text-sm text-blue-500 font-medium">{user.amount}</span>
                 </div>
               </div>
             ))}

@@ -120,7 +120,7 @@ export default function PromotionalBanner() {
                   <p className="text-white/90 mt-1 mb-3 text-xs">
                     {banner.description}
                   </p>
-                  <button className="bg-unicef text-white font-semibold py-1.5 px-4 rounded-full text-xs w-auto self-start">
+                  <button className="bg-blue-500 text-white font-semibold py-1.5 px-4 rounded-full text-xs w-auto self-start">
                     Check it out
                   </button>
                 </div>
@@ -172,7 +172,7 @@ export default function PromotionalBanner() {
                   <p className="text-white/90 mt-1 mb-3 text-sm">
                     {banner.description}
                   </p>
-<button className="bg-unicef text-white font-semibold py-1.5 px-5 rounded-full text-sm w-auto self-start">
+<button className="bg-blue-500 text-white font-semibold py-1.5 px-5 rounded-full text-sm w-auto self-start">
   Check it out
 </button>
                 </div>

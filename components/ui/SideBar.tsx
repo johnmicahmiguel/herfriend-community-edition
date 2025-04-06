@@ -73,7 +73,7 @@ const LobbyItem = memo(
     lobby: Pick<Lobby, "id" | "hostName" | "thumbnail" | "viewers" | "isLive">;
   }) => (
     <Link href={`/lobby/${lobby.id}`} className="block">
-      <div className="flex items-center space-x-3 hover:bg-gray-100 p-2 rounded-md transition-colors">
+      <div className="flex items-center space-x-3 hover:bg-gray-100 p-2 rounded-md transition-colors dark:hover:bg-gray-800">
         <div className="relative w-10 h-10 flex-shrink-0">
           <Image
             src={lobby.thumbnail}
@@ -84,14 +84,14 @@ const LobbyItem = memo(
           />
         </div>
         <div className="overflow-hidden">
-          <p className="font-medium text-sm truncate text-gray-700">
+          <p className="font-medium text-sm truncate text-gray-700 dark:text-gray-300">
             {lobby.hostName}
           </p>
           <div className="flex items-center mt-0.5">
             {lobby.isLive && (
-                <div className="w-2 h-2 bg-unicef rounded-full mr-1.5"></div>
+                <div className="w-2 h-2 bg-blue-500 rounded-full mr-1.5"></div>
             )}
-            <p className="text-xs text-gray-600">
+            <p className="text-xs text-gray-600 dark:text-gray-400">
               {lobby.isLive ? `${formatViewerCount(lobby.viewers)} viewers` : "Offline"}
             </p>
           </div>
@@ -161,21 +161,21 @@ export default function SideBar() {
       {/* Sidebar */}
       <aside
         className={`
-          top-0 md:top-16 left-0 h-full w-64 bg-white text-gray-800 p-4 overflow-y-auto border-r border-gray-200
+          fixed top-0 md:top-16 left-0 h-screen md:h-[calc(100vh-4rem)] w-64 bg-white text-gray-800 p-4 overflow-y-auto border-r border-gray-200 dark:bg-gray-900 dark:border-gray-700 dark:text-gray-200
           transition-transform duration-300 ease-in-out
-          ${isMobileSidebarOpen ? "fixed z-50 translate-x-0" : "fixed z-50 -translate-x-full"}
-          md:min-h-screen md:overflow-y-auto md:translate-x-0 md:block md:transition-none
+          ${isMobileSidebarOpen ? "z-50 translate-x-0" : "z-50 -translate-x-full"}
+          md:translate-x-0 md:block md:transition-none
         `}
       >
         {/* Close button on mobile */}
         <div className="flex justify-end mb-4 md:hidden">
           <button
             onClick={() => setIsMobileSidebarOpen(false)}
-            className="p-2 rounded-md hover:bg-gray-100 transition-colors"
+            className="p-2 rounded-md hover:bg-gray-100 transition-colors dark:hover:bg-gray-800"
             aria-label="Close sidebar"
           >
             <svg
-              className="w-6 h-6 text-gray-800"
+              className="w-6 h-6 text-gray-800 dark:text-gray-200"
               fill="none"
               stroke="currentColor"
               strokeWidth="2"
@@ -191,28 +191,28 @@ export default function SideBar() {
         </div>
 
         {/* Combined Navigation & Actions Menu */}
-        <nav className="mb-6 pb-4 border-b border-gray-200">
+        <nav className="mb-6 pb-4 border-b border-gray-200 dark:border-gray-700">
           <ul className="space-y-2">
             {/* Home Link */}
             <li>
               <Link
                 href="/"
-                className="flex items-center space-x-3 p-2 rounded-md hover:bg-gray-100 transition-colors"
+                className="flex items-center space-x-3 p-2 rounded-md hover:bg-gray-100 transition-colors dark:hover:bg-gray-800"
               >
-                <Home size={20} className="text-gray-700" />
-                <span className="font-medium text-base">Home</span>
+                <Home size={20} className="text-gray-700 dark:text-gray-400" />
+                <span className="font-medium text-base dark:text-gray-200">Home</span>
               </Link>
             </li>
             {/* Messages Button */}
             <li>
               <button
                 onClick={toggleMessagesPanel}
-                className="flex items-center space-x-3 p-2 w-full text-left rounded-md hover:bg-gray-100 transition-colors relative"
+                className="flex items-center space-x-3 p-2 w-full text-left rounded-md hover:bg-gray-100 transition-colors relative dark:hover:bg-gray-800"
               >
-                <MessageSquare size={20} className="text-gray-700" />
-                <span className="font-medium text-base">Messages</span>
+                <MessageSquare size={20} className="text-gray-700 dark:text-gray-400" />
+                <span className="font-medium text-base dark:text-gray-200">Messages</span>
                 {unreadCount > 0 && (
-                  <div className="absolute top-0 left-5 flex items-center justify-center min-w-[20px] h-5 bg-unicef text-white text-xs font-bold rounded-full px-1.5">
+                  <div className="absolute top-0 left-5 flex items-center justify-center min-w-[20px] h-5 bg-blue-500 text-white text-xs font-bold rounded-full px-1.5">
                     {unreadCount > 99 ? "99+" : unreadCount}
                   </div>
                 )}
@@ -224,10 +224,10 @@ export default function SideBar() {
               <li>
                 <button
                   onClick={() => setLoginModalOpen(true)}
-                  className="flex items-center space-x-3 p-2 w-full text-left rounded-md hover:bg-gray-100 transition-colors"
+                  className="flex items-center space-x-3 p-2 w-full text-left rounded-md hover:bg-gray-100 transition-colors dark:hover:bg-gray-800"
                 >
-                  <LogIn size={20} className="text-unicef" />
-                  <span className="font-medium text-base text-unicef">
+                  <LogIn size={20} className="text-blue-500" />
+                  <span className="font-medium text-base text-blue-500 dark:text-blue-400">
                     Sign In
                   </span>
                 </button>
@@ -239,10 +239,10 @@ export default function SideBar() {
               <li>
                 <button
                   onClick={signOut}
-                  className="flex items-center space-x-3 p-2 w-full text-left rounded-md hover:bg-gray-100 transition-colors"
+                  className="flex items-center space-x-3 p-2 w-full text-left rounded-md hover:bg-gray-100 transition-colors dark:hover:bg-gray-800"
                 >
-                  <LogOut size={20} className="text-red-500" />
-                  <span className="font-medium text-base text-red-500">
+                  <LogOut size={20} className="text-red-500 dark:text-red-400" />
+                  <span className="font-medium text-base text-red-500 dark:text-red-400">
                     Log Out
                   </span>
                 </button>
@@ -253,7 +253,7 @@ export default function SideBar() {
 
         {/* Recommended Lobbies Section */}
         <div>
-          <h3 className="text-xs font-semibold uppercase text-gray-500 mb-2 px-2">
+          <h3 className="text-xs font-semibold uppercase text-gray-500 mb-2 px-2 dark:text-gray-400">
             Recommended Lobbies
           </h3>
           <ul className="space-y-1">
