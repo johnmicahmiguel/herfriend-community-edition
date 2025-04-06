@@ -176,24 +176,24 @@ const MessagePanel: React.FC<MessagePanelProps> = ({ open, onClose }) => {
       <>
         {open && (
           <div
-            className={`fixed inset-y-0 right-0 z-[90] w-full sm:w-96 bg-white shadow-lg transform transition-transform duration-300 ease-in-out ${
+            className={`fixed inset-y-0 right-0 z-[90] w-full sm:w-96 bg-white dark:bg-gray-800 shadow-lg transform transition-transform duration-300 ease-in-out ${
               open ? "translate-x-0" : "translate-x-full"
             }`}
           >
             <div className="flex flex-col h-full">
-              <div className="flex items-center justify-between p-4 border-b">
+              <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
                 <h2 className="text-lg font-semibold text-blue-500">Messages</h2>
                 <button
                   onClick={onClose}
-                  className="p-2 rounded-full hover:bg-gray-100"
+                  className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700"
                 >
-                  <X size={20} className="text-gray-500" />
+                  <X size={20} className="text-gray-500 dark:text-gray-400" />
                 </button>
               </div>
 
               <div className="flex-1 flex items-center justify-center p-4">
                 <div className="text-center">
-                  <p className="text-gray-600 mb-4">
+                  <p className="text-gray-600 dark:text-gray-400 mb-4">
                     Please sign in to access your messages
                   </p>
                 </div>
@@ -210,21 +210,21 @@ const MessagePanel: React.FC<MessagePanelProps> = ({ open, onClose }) => {
   return (
     <>
       <div
-        className={`fixed inset-y-0 right-0 z-[90] w-full sm:w-96 bg-white shadow-lg transform transition-transform duration-300 ease-in-out ${
+        className={`fixed inset-y-0 right-0 z-[90] w-full sm:w-96 bg-white dark:bg-gray-800 shadow-lg transform transition-transform duration-300 ease-in-out ${
           open ? "translate-x-0" : "translate-x-full"
         }`}
       >
         <div className="flex flex-col h-full">
           {/* Header */}
-          <div className="flex items-center justify-between p-4 border-b">
-            <h2 className="text-lg font-semibold text-blue-500">
+          <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
+            <h2 className="text-lg font-semibold text-blue-500 dark:text-blue-400">
               {selectedThread ? "Message" : "Messages"}
             </h2>
             <div className="flex items-center space-x-2">
               {!selectedThread && !showSearch && (
                 <button
                   onClick={() => setShowSearch(true)}
-                  className="p-2 text-gray-600 hover:text-blue-500 rounded-full hover:bg-gray-100"
+                  className="p-2 text-gray-600 dark:text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -246,17 +246,39 @@ const MessagePanel: React.FC<MessagePanelProps> = ({ open, onClose }) => {
               )}
               <button
                 onClick={onClose}
-                className="p-2 rounded-full hover:bg-gray-100"
+                className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700"
               >
-                <X size={20} className="text-gray-500" />
+                <X size={20} className="text-gray-500 dark:text-gray-400" />
               </button>
             </div>
           </div>
 
-          {/* Content Area - Conditionally show thread list, message view, or search */}
-          <div className="flex-1 overflow-y-auto">
+          {/* Content Area */}
+          <div className="flex-1 overflow-hidden">
             {showSearch ? (
-              <MessageSearch onSelectUser={handleSelectUser} />
+              <div className="h-full flex flex-col">
+                <div className="p-4 border-b border-gray-200 dark:border-gray-700">
+                  <div className="flex items-center">
+                    <button
+                      onClick={() => setShowSearch(false)}
+                      className="p-2 mr-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700"
+                    >
+                      <X size={20} className="text-gray-500 dark:text-gray-400" />
+                    </button>
+                    <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100">
+                      New Message
+                    </h3>
+                  </div>
+                  <div className="mt-3">
+                    <MessageSearch onSelectUser={handleSelectUser} />
+                  </div>
+                </div>
+                <div className="flex-1 overflow-y-auto p-4">
+                  <p className="text-sm text-gray-500 dark:text-gray-400 text-center">
+                    Search for users to message
+                  </p>
+                </div>
+              </div>
             ) : selectedThread ? (
               <MessageView
                 selectedThread={selectedThread}

@@ -130,7 +130,7 @@ const TopMenuBar = () => {
   };
 
   return (
-    <header className="bg-white shadow-sm w-full z-[60] relative dark:bg-gray-900 dark:border-b dark:border-gray-700">
+    <header className="bg-white shadow-sm w-full z-[60] dark:bg-gray-900 dark:border-b dark:border-gray-700 fixed top-0 left-0">
       <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16 items-center">
           {/* Mobile Hamburger Button */}

@@ -44,8 +44,10 @@ export default function RootLayout({
                         {/* Top Menu Bar */}
                         <TopMenuBar />
 
-                        <div className="flex flex-1">
+                        {/* Add overflow-hidden here */}
+                        <div className="flex flex-1 overflow-hidden pt-16">
                           {/* Sidebar with live lobbies */}
+                          {/* <SideBar /> */}
                           <SideBar />
 
                           {/* Main content */}

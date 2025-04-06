@@ -13,6 +13,7 @@ import {
   LogOut,
   Construction,
   LayoutDashboard,
+  Trophy,
 } from "lucide-react";
 import { useAuth } from "@/lib/context/auth.context";
 import { LoginModal } from "@/components/auth/LoginModal";
@@ -219,6 +220,19 @@ export default function SideBar() {
               </button>
             </li>
 
+            {/* Mission Center - Only show for authenticated users */}
+            {!loading && user && !isAnonymous && (
+              <li>
+                <Link
+                  href="/missions"
+                  className="flex items-center space-x-3 p-2 rounded-md hover:bg-gray-100 transition-colors dark:hover:bg-gray-800"
+                >
+                  <Trophy size={20} className="text-yellow-500 dark:text-yellow-400" />
+                  <span className="font-medium text-base dark:text-gray-200">Mission Center</span>
+                </Link>
+              </li>
+            )}
+
             {/* Add Sign In option for anonymous or not logged in users */}
             {!loading && (!user || isAnonymous) && (
               <li>
@@ -277,3 +291,4 @@ export default function SideBar() {
     </>
   );
 }
+

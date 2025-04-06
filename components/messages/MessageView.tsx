@@ -34,14 +34,14 @@ const MessageInput: React.FC<{
   };
 
   return (
-    <div className="px-3 py-3 border-t border-gray-200">
+    <div className="px-3 py-3 border-t border-gray-200 dark:border-gray-700">
       <div className="flex items-center space-x-2">
         <input
           type="text"
           value={message}
           onChange={(e) => setMessage(e.target.value)}
           placeholder="Type a message..."
-          className="flex-1 py-2 px-3 bg-gray-100 rounded-full text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+          className="flex-1 py-2 px-3 bg-gray-100 dark:bg-gray-700 rounded-full text-sm text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:placeholder-gray-400"
           onKeyDown={(e) => {
             if (e.key === "Enter" && !e.shiftKey) {
               e.preventDefault();
@@ -55,7 +55,7 @@ const MessageInput: React.FC<{
           className={`p-2 rounded-full ${
             message.trim() && !isSending
               ? "bg-blue-500 text-white"
-              : "bg-gray-200 text-gray-400"
+              : "bg-gray-200 dark:bg-gray-600 text-gray-400 dark:text-gray-500"
           }`}
         >
           <Send size={18} />
@@ -85,14 +85,14 @@ const MessageBubble: React.FC<{
         className={`max-w-[80%] px-3 py-2 rounded-lg ${
           isCurrentUser
             ? "bg-blue-500 text-white rounded-tr-none"
-            : "bg-gray-100 text-gray-800 rounded-tl-none"
+            : "bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-tl-none"
         }`}
       >
         <p className="text-sm whitespace-pre-wrap break-words">
           {message.content}
         </p>
         <div
-          className={`text-xs mt-1 ${isCurrentUser ? "text-blue-100" : "text-gray-500"}`}
+          className={`text-xs mt-1 ${isCurrentUser ? "text-blue-100" : "text-gray-500 dark:text-gray-400"}`}
         >
           {formattedTime}
           {isCurrentUser && (
@@ -115,7 +115,7 @@ const DateSeparator: React.FC<{ date: Date }> = ({ date }) => {
 
   return (
     <div className="flex justify-center my-3">
-      <div className="bg-gray-200 text-gray-600 text-xs px-2 py-1 rounded-full">
+      <div className="bg-gray-200 dark:bg-gray-600 text-gray-600 dark:text-gray-300 text-xs px-2 py-1 rounded-full">
         {formattedDate}
       </div>
     </div>
@@ -233,9 +233,9 @@ const MessageView: React.FC<MessageViewProps> = ({
 
   if (!selectedThread) {
     return (
-      <div className="flex-1 flex items-center justify-center bg-gray-50">
+      <div className="flex-1 flex items-center justify-center bg-gray-50 dark:bg-gray-800">
         <div className="text-center p-4">
-          <p className="text-gray-600">
+          <p className="text-gray-600 dark:text-gray-400">
             Select a conversation to view messages
           </p>
         </div>
@@ -246,26 +246,28 @@ const MessageView: React.FC<MessageViewProps> = ({
   return (
     <div className="flex flex-col h-full">
       {/* Header with user info */}
-      <div className="flex items-center p-3 border-b border-gray-200">
+      <div className="flex items-center p-3 border-b border-gray-200 dark:border-gray-700">
         <button
           onClick={onBack}
-          className="mr-2 p-1 rounded-full hover:bg-gray-100"
+          className="p-2 rounded-full text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 mr-2"
         >
-          <ChevronLeft size={20} className="text-gray-600" />
+          <ChevronLeft size={20} />
         </button>
-
-        <div className="flex items-center">
+        <div className="flex items-center flex-1">
           <div className="w-10 h-10 rounded-full overflow-hidden mr-3">
             <Image
-              src={selectedThread.otherUserPhoto}
-              alt="User Avatar"
+              src={
+                selectedThread.otherUserPhoto ||
+                "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=facearea&facepad=2&w=256&h=256&q=80&sat=-100"
+              }
+              alt={selectedThread.otherUserName}
               width={40}
               height={40}
               className="object-cover"
             />
           </div>
           <div>
-            <h3 className="font-medium text-gray-900">
+            <h3 className="font-medium text-gray-900 dark:text-gray-100">
               {selectedThread.otherUserName}
             </h3>
           </div>
@@ -273,44 +275,54 @@ const MessageView: React.FC<MessageViewProps> = ({
       </div>
 
       {/* Message list */}
-      <ScrollArea.Root className="flex-grow overflow-hidden">
-        <ScrollArea.Viewport className="h-full w-full">
-          <div className="p-4">
-            {isLoading ? (
-              <div className="flex justify-center items-center h-40">
-                <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
+      <div className="flex-1 overflow-y-auto p-4 bg-white dark:bg-gray-800">
+        {isLoading ? (
+          <div className="flex justify-center items-center h-full">
+            <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
+          </div>
+        ) : messages.length === 0 ? (
+          <div className="flex flex-col justify-center items-center h-full p-4 text-center">
+            <div className="bg-gray-100 dark:bg-gray-700 rounded-full p-4 mb-4">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-10 w-10 text-gray-400 dark:text-gray-500"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={1.5}
+                  d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+                />
+              </svg>
+            </div>
+            <h3 className="text-base font-medium text-gray-700 dark:text-gray-300 mb-1">
+              No messages yet
+            </h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              Send a message to start the conversation
+            </p>
+          </div>
+        ) : (
+          <div className="space-y-1">
+            {messageGroups.map((group, groupIndex) => (
+              <div key={group.date.toISOString()}>
+                <DateSeparator date={group.date} />
+                {group.messages.map((message) => (
+                  <MessageBubble
+                    key={message.id}
+                    message={message}
+                    isCurrentUser={message.senderId === currentUserId}
+                  />
+                ))}
               </div>
-            ) : messageGroups.length === 0 ? (
-              <div className="flex flex-col justify-center items-center h-40 text-center">
-                <p className="text-gray-500 mb-2">No messages yet</p>
-                <p className="text-sm text-gray-400">
-                  Start the conversation by sending a message
-                </p>
-              </div>
-            ) : (
-              messageGroups.map((group, groupIndex) => (
-                <div key={group.date.toISOString()}>
-                  <DateSeparator date={group.date} />
-                  {group.messages.map((message) => (
-                    <MessageBubble
-                      key={message.id}
-                      message={message}
-                      isCurrentUser={message.senderId === currentUserId}
-                    />
-                  ))}
-                </div>
-              ))
-            )}
+            ))}
             <div ref={messagesEndRef} />
           </div>
-        </ScrollArea.Viewport>
-        <ScrollArea.Scrollbar
-          className="flex select-none touch-none p-0.5 bg-transparent transition-colors duration-[160ms] ease-out hover:bg-black/10 data-[orientation=vertical]:w-2.5 data-[orientation=horizontal]:flex-col data-[orientation=horizontal]:h-2.5"
-          orientation="vertical"
-        >
-          <ScrollArea.Thumb className="flex-1 bg-gray-300 rounded-[10px] relative before:content-[''] before:absolute before:top-1/2 before:left-1/2 before:-translate-x-1/2 before:-translate-y-1/2 before:w-full before:h-full before:min-w-[44px] before:min-h-[44px]" />
-        </ScrollArea.Scrollbar>
-      </ScrollArea.Root>
+        )}
+      </div>
 
       {/* Message input */}
       <MessageInput onSendMessage={handleSendMessage} />

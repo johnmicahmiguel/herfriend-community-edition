@@ -102,7 +102,7 @@ const NavigationButton = memo(
   }) => (
     <button
       onClick={() => onClick()}
-      className={`absolute ${direction === "left" ? "left-0" : "right-0"} top-1/2 -translate-y-1/2 z-10 bg-white/80 rounded-full p-2 shadow-md hover:bg-blue-500 hover:text-white ${
+      className={`absolute ${direction === "left" ? "left-0" : "right-0"} top-1/2 -translate-y-1/2 z-10 bg-white/80 dark:bg-gray-800/80 rounded-full p-2 shadow-md hover:bg-blue-500 hover:text-white dark:text-gray-200 ${
         disabled ? "opacity-0" : "opacity-100"
       }`}
       aria-label={`Scroll ${direction}`}
@@ -265,7 +265,7 @@ function LobbyGrid() {
 
   return (
     <div
-      className="relative w-full max-w-full overflow-hidden"
+      className="relative w-full max-w-full overflow-hidden dark:bg-gray-900"
       ref={scrollAreaRef}
     >
       {/* Left navigation arrow */}
@@ -284,7 +284,7 @@ function LobbyGrid() {
         scrollHideDelay={400}
       >
         <ScrollArea.Viewport
-          className={`w-full h-full ${isDragging ? "cursor-grabbing" : "cursor-grab"} no-scrollbar`}
+          className={`w-full h-full ${isDragging ? "cursor-grabbing" : "cursor-grab"} no-scrollbar dark:bg-gray-900`}
           ref={scrollViewportRef}
           onScroll={handleScroll}
           onMouseDown={handleMouseDown}

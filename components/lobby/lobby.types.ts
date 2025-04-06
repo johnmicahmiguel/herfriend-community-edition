@@ -9,6 +9,8 @@ export interface ChatMessage {
   message: string;
   avatar: string;
   time: string;
+  level?: number;
+  badge?: string;
 }
 
 export interface LobbyChatProps {

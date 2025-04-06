@@ -1,13 +1,105 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import { Users } from "lucide-react";
+import { Users, Trophy, X, Award } from "lucide-react";
+import * as Dialog from "@radix-ui/react-dialog";
 import LobbyHeader from "@/components/lobby/LobbyHeader";
 import LobbyTabs from "@/components/lobby/LobbyTabs";
 import LobbyChat from "@/components/lobby/LobbyChat";
 import LobbySidebar from "@/components/lobby/LobbySidebar";
+import { useAuth } from "@/lib/context/auth.context";
+import MissionCenterContent from "@/components/user/MissionCenterContent";
+import { Mission, UserLevel } from "@/components/user/MissionTypes"; // Import types
+import type { ChatMessage } from "@/components/lobby/lobby.types"; // Import type
+
+// Mock data for Mission Center (replace with actual data fetching later)
+const mockDailyMissions: Mission[] = [
+  {
+    id: "d1",
+    title: "Visit a Lobby",
+    description: "Join any lobby for at least 5 minutes",
+    reward: {
+      type: "xp" as const,
+      value: 50,
+    },
+    progress: 1,
+    total: 1,
+    completed: true,
+  },
+  {
+    id: "d2",
+    title: "Send 5 Messages",
+    description: "Send messages in any lobby chat",
+    reward: {
+      type: "xp" as const,
+      value: 30,
+    },
+    progress: 3,
+    total: 5,
+    completed: false,
+  },
+];
+const mockWeeklyMissions: Mission[] = [
+  {
+    id: "w1",
+    title: "Visit 10 Different Lobbies",
+    description: "Explore different lobbies throughout the week",
+    reward: {
+      type: "xp" as const,
+      value: 200,
+    },
+    progress: 4,
+    total: 10,
+    completed: false,
+  },
+  {
+    id: "w2",
+    title: "Send 50 Messages",
+    description: "Be active in lobby chats this week",
+    reward: {
+      type: "coin" as const,
+      value: 100,
+    },
+    progress: 22,
+    total: 50,
+    completed: false,
+  },
+];
+const mockOnetimeMissions: Mission[] = [
+  {
+    id: "o1",
+    title: "Create Your Profile",
+    description: "Complete your profile with a picture and bio",
+    reward: {
+      type: "xp" as const,
+      value: 100,
+    },
+    progress: 1,
+    total: 1,
+    completed: true,
+  },
+  {
+    id: "o3",
+    title: "Reach Level 10",
+    description: "Continue to complete missions to reach level 10",
+    reward: {
+      type: "item" as const,
+      value: "Exclusive Avatar Frame",
+    },
+    progress: 3,
+    total: 10,
+    completed: false,
+  },
+];
+const mockUserLevel: UserLevel = {
+  level: 3,
+  currentXP: 742,
+  requiredXP: 1000,
+  progress: 74.2,
+};
 
 export default function LobbyPage() {
+  const { user, loading, isAnonymous } = useAuth();
   const [activeTab, setActiveTab] = useState("hosts");
   const [speakingUser, setSpeakingUser] = useState("Jane Smith");
   const [showMobileSidebar, setShowMobileSidebar] = useState(false);
@@ -17,6 +109,7 @@ export default function LobbyPage() {
   const [visibleCoHostId, setVisibleCoHostId] = useState<string | null>(null);
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [profileUserId, setProfileUserId] = useState<string | null>(null);
+  const [missionCenterOpen, setMissionCenterOpen] = useState(false);
 
   const coHostRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
   const goalTooltipContainerRef = useRef<HTMLDivElement | null>(null);
@@ -136,10 +229,11 @@ export default function LobbyPage() {
   };
   
   // Dummy data for chat messages
-  const chatMessages = [
-    { id: "1", user: "Alex", message: "This is so informative!", avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=1000", time: "2 mins ago" },
-    { id: "2", user: "Sarah", message: "I love learning about nature!", avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=1000", time: "5 mins ago" },
-    { id: "3", user: "Michael", message: "Can you explain more about ecosystems?", avatar: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=1000", time: "7 mins ago" }
+  const chatMessages: ChatMessage[] = [
+    { id: "1", user: "Alex", message: "This is so informative!", avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=1000", time: "2 mins ago", level: 55, badge: "Ultimate Boss" },
+    { id: "2", user: "Sarah", message: "I love learning about nature!", avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=1000", time: "5 mins ago", level: 22, badge: "Most Loyal" },
+    { id: "3", user: "Michael", message: "Can you explain more about ecosystems?", avatar: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=1000", time: "7 mins ago", level: 8, badge: "Newbie" },
+    { id: "4", user: "HostJane", message: "Welcome everyone! Happy to answer questions.", avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=1000", time: "1 min ago", level: 32, badge: "Grinder" },
   ];
   
   // Dummy data for side bar
@@ -199,7 +293,7 @@ export default function LobbyPage() {
   }, [visibleCoHostId, showGoalTooltip, showPinnedTooltip]);
 
   return (
-    <div className="h-[calc(100vh-80px)] md:h-[calc(100vh-64px)] flex flex-col md:flex-row overflow-hidden bg-gray-50">
+    <div className="h-[calc(100vh-80px)] md:h-[calc(100vh-64px)] flex flex-col md:flex-row overflow-hidden bg-gray-50 dark:bg-gray-900 relative">
       {/* Main content area */}
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Header section */}
@@ -210,8 +304,8 @@ export default function LobbyPage() {
           gifts={lobbyData.gifts}
         />
 
-        {/* Main content tabs and chat */}
-        <div className="flex-1 flex flex-col overflow-hidden">
+        {/* Main content tabs and chat - Added relative positioning */}
+        <div className="flex-1 flex flex-col overflow-hidden relative">
           <LobbyTabs
             activeTab={activeTab}
             setActiveTab={setActiveTab}
@@ -236,6 +330,33 @@ export default function LobbyPage() {
           
           {/* Chat section */}
           <LobbyChat chatMessages={chatMessages} />
+
+          {/* Floating Buttons Container - Positioned above chat input */}
+          <div className="absolute bottom-20 right-4 z-10 flex flex-col items-end gap-3">
+            {/* Mobile Top Users button */}
+            <div className="md:hidden">
+              <button 
+                onClick={() => setShowMobileSidebar(true)}
+                className="bg-blue-500 text-white rounded-full p-2 shadow-lg hover:shadow-xl transition-shadow" 
+                aria-label="View Top Users"
+              >
+                <Users size={18} />
+              </button>
+            </div>
+
+            {/* Mission Center Button (Authenticated users only) */}
+            {!loading && user && !isAnonymous && (
+              <button 
+                onClick={() => setMissionCenterOpen(true)}
+                className="relative bg-yellow-500 text-white rounded-full p-2 shadow-lg hover:shadow-xl transition-shadow" 
+                aria-label="View Mission Center"
+              >
+                <Trophy size={18} />
+                {/* Notification Dot - Conditionally render this later */}
+                <span className="absolute -top-0.5 -right-0.5 block h-2.5 w-2.5 rounded-full bg-red-500 ring-2 ring-white dark:ring-gray-900" />
+              </button>
+            )}
+          </div>
         </div>
       </div>
 
@@ -251,16 +372,45 @@ export default function LobbyPage() {
         />
       )}
       
-      {/* Floating button for mobile */}
-      <div className="md:hidden fixed top-20 right-4 z-10">
-        <button 
-          onClick={() => setShowMobileSidebar(true)}
-          className="bg-blue-500 text-white rounded-full p-2 shadow-lg hover:shadow-xl transition-shadow" 
-          aria-label="View Top Users"
-        >
-          <Users size={18} />
-        </button>
-      </div>
+      {/* Mission Center Dialog */}
+      <Dialog.Root open={missionCenterOpen} onOpenChange={setMissionCenterOpen}>
+        <Dialog.Portal>
+          <Dialog.Overlay className="fixed inset-0 bg-black/50 z-50" />
+          <Dialog.Content className="fixed top-[50%] left-[50%] max-h-[90vh] w-[90vw] max-w-[800px] translate-x-[-50%] translate-y-[-50%] bg-white dark:bg-gray-800 rounded-lg shadow-lg z-50 overflow-hidden flex flex-col">
+            <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Award className="text-amber-500" size={20} />
+                <Dialog.Title className="text-lg font-bold text-gray-800 dark:text-gray-100">
+                  Mission Center
+                </Dialog.Title>
+              </div>
+              <Dialog.Close asChild>
+                <button className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+                  <X size={20} />
+                </button>
+              </Dialog.Close>
+            </div>
+            
+            <div className="flex-1 overflow-y-auto no-scrollbar">
+              <MissionCenterContent 
+                dailyMissions={mockDailyMissions}
+                weeklyMissions={mockWeeklyMissions}
+                onetimeMissions={mockOnetimeMissions}
+                userLevel={mockUserLevel}
+              />
+            </div>
+            
+            {/* Optional: Add a close button at the bottom if needed */}
+            {/* <div className="p-4 border-t border-gray-200 dark:border-gray-700 flex justify-end">
+              <Dialog.Close asChild>
+                <button className="px-4 py-2 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 rounded-md text-sm font-medium transition-colors">
+                  Close
+                </button>
+              </Dialog.Close>
+            </div> */}
+          </Dialog.Content>
+        </Dialog.Portal>
+      </Dialog.Root>
     </div>
   );
 }

@@ -27,7 +27,7 @@ function LobbyCard({ lobby, preventNavigation = false }: LobbyCardProps) {
 
   return (
     <div
-      className="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-300 cursor-pointer"
+      className="bg-white dark:bg-gray-800 rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-300 cursor-pointer"
       onClick={handleCardClick}
       role="link"
       tabIndex={0}
@@ -60,11 +60,11 @@ function LobbyCard({ lobby, preventNavigation = false }: LobbyCardProps) {
 
       {/* Lobby info */}
       <div className="p-4">
-        <h3 className="font-semibold text-gray-800 truncate text-lg">
+        <h3 className="font-semibold text-gray-800 dark:text-gray-100 truncate text-lg">
           {title}
         </h3>
-        <p className="text-base text-gray-600 mt-2">{hostName}</p>
-        <p className="text-sm text-gray-500 mt-1">{category}</p>
+        <p className="text-base text-gray-600 dark:text-gray-300 mt-2">{hostName}</p>
+        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{category}</p>
       </div>
     </div>
   );

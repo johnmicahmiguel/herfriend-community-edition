@@ -23,7 +23,7 @@ interface SearchResult {
 const UserItem: React.FC<UserItemProps> = ({ user, onSelect }) => {
   return (
     <div
-      className="flex items-center gap-3 p-3 hover:bg-gray-50 cursor-pointer transition-colors"
+      className="flex items-center gap-3 p-3 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition-colors"
       onClick={() => onSelect(user)}
     >
       <div className="w-12 h-12 rounded-full overflow-hidden">
@@ -39,10 +39,10 @@ const UserItem: React.FC<UserItemProps> = ({ user, onSelect }) => {
         />
       </div>
       <div className="flex-1 min-w-0">
-        <h3 className="font-medium text-gray-900 truncate">
+        <h3 className="font-medium text-gray-900 dark:text-gray-100 truncate">
           {user.name || "User"}
         </h3>
-        <p className="text-sm text-gray-500 truncate">{user.email}</p>
+        <p className="text-sm text-gray-500 dark:text-gray-400 truncate">{user.email}</p>
       </div>
     </div>
   );
@@ -56,6 +56,8 @@ const MessageSearch: React.FC<MessageSearchProps> = ({ onSelectUser }) => {
         type="text"
         value={searchQuery}
         onChange={(e) => setSearchQuery(e.target.value)}
+        className="w-full px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-100"
+        placeholder="Search users..."
       />
     </div>
   );

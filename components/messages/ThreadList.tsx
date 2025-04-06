@@ -18,8 +18,8 @@ const ThreadItem: React.FC<{
 }> = ({ thread, isActive, onClick }) => {
   return (
     <div
-      className={`flex items-start gap-3 p-3 cursor-pointer hover:bg-gray-50 transition-colors ${
-        isActive ? "bg-gray-100" : ""
+      className={`flex items-start gap-3 p-3 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors ${
+        isActive ? "bg-gray-100 dark:bg-gray-700" : ""
       }`}
       onClick={onClick}
     >
@@ -49,16 +49,16 @@ const ThreadItem: React.FC<{
       {/* Thread Content */}
       <div className="flex-1 min-w-0">
         <div className="flex justify-between items-baseline">
-          <h3 className="font-medium text-gray-900 truncate">
+          <h3 className="font-medium text-gray-900 dark:text-gray-100 truncate">
             {thread.otherUserName}
           </h3>
-          <span className="text-xs text-gray-500 whitespace-nowrap">
+          <span className="text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">
             {formatRelativeTime(thread.lastTimestamp)}
           </span>
         </div>
 
         <p
-          className={`text-sm truncate ${thread.unreadCount > 0 ? "font-medium text-gray-900" : "text-gray-600"}`}
+          className={`text-sm truncate ${thread.unreadCount > 0 ? "font-medium text-gray-900 dark:text-gray-100" : "text-gray-600 dark:text-gray-400"}`}
         >
           {thread.lastMessage || "Start a conversation"}
         </p>
@@ -92,7 +92,7 @@ const ThreadList: React.FC<ThreadListProps> = ({
           <div className="flex flex-col justify-center items-center h-full p-4 text-center">
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              className="h-16 w-16 text-gray-300 mb-4"
+              className="h-16 w-16 text-gray-300 dark:text-gray-600 mb-4"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -104,10 +104,10 @@ const ThreadList: React.FC<ThreadListProps> = ({
                 d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"
               />
             </svg>
-            <h3 className="text-base font-medium text-gray-700 mb-1">
+            <h3 className="text-base font-medium text-gray-700 dark:text-gray-300 mb-1">
               No messages yet
             </h3>
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-gray-500 dark:text-gray-400">
               Start a new conversation by clicking the message icon above
             </p>
           </div>
@@ -119,7 +119,7 @@ const ThreadList: React.FC<ThreadListProps> = ({
   return (
     <div className="flex flex-col h-full">
       <div className="flex-1 overflow-y-auto">
-        <div className="divide-y divide-gray-200">
+        <div className="divide-y divide-gray-200 dark:divide-gray-700">
           {threads.map((thread) => (
             <ThreadItem
               key={thread.threadId}
