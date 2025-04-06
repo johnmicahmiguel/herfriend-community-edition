@@ -20,6 +20,8 @@ import MessagePanel from "@/components/messages/MessagePanel";
 import { getUserUnreadCountRef } from "@/lib/firebase/database";
 import { onValue, off } from "firebase/database";
 import { useEffect } from "react";
+import { useSidebar } from "@/lib/context/sidebar.context";
+import { usePathname } from "next/navigation";
 
 // Dummy data for lobbies (Copied from LobbyGrid for now)
 const DUMMY_LOBBIES: Lobby[] = [
@@ -106,6 +108,13 @@ export default function SideBar() {
   const [loginModalOpen, setLoginModalOpen] = useState(false);
   const [messagesPanelOpen, setMessagesPanelOpen] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
+  const { isMobileSidebarOpen, setIsMobileSidebarOpen } = useSidebar();
+  const pathname = usePathname();
+
+  // Auto-close sidebar on route change
+  useEffect(() => {
+    setIsMobileSidebarOpen(false);
+  }, [pathname, setIsMobileSidebarOpen]);
 
   // Listen for unread message count changes when user is authenticated
   useEffect(() => {
@@ -140,7 +149,47 @@ export default function SideBar() {
 
   return (
     <>
-      <aside className="hidden md:block w-64 bg-white text-gray-800 p-4 overflow-y-auto border-r border-gray-200">
+
+      {/* Mobile Sidebar Backdrop */}
+      {isMobileSidebarOpen && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
+          onClick={() => setIsMobileSidebarOpen(false)}
+        ></div>
+      )}
+
+      {/* Sidebar */}
+      <aside
+        className={`
+          top-0 md:top-16 left-0 h-full w-64 bg-white text-gray-800 p-4 overflow-y-auto border-r border-gray-200
+          transition-transform duration-300 ease-in-out
+          ${isMobileSidebarOpen ? "fixed z-50 translate-x-0" : "fixed z-50 -translate-x-full"}
+          md:min-h-screen md:overflow-y-auto md:translate-x-0 md:block md:transition-none
+        `}
+      >
+        {/* Close button on mobile */}
+        <div className="flex justify-end mb-4 md:hidden">
+          <button
+            onClick={() => setIsMobileSidebarOpen(false)}
+            className="p-2 rounded-md hover:bg-gray-100 transition-colors"
+            aria-label="Close sidebar"
+          >
+            <svg
+              className="w-6 h-6 text-gray-800"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
+          </button>
+        </div>
+
         {/* Combined Navigation & Actions Menu */}
         <nav className="mb-6 pb-4 border-b border-gray-200">
           <ul className="space-y-2">
@@ -170,7 +219,7 @@ export default function SideBar() {
               </button>
             </li>
 
-             {/* Add Sign In option for anonymous or not logged in users */}
+            {/* Add Sign In option for anonymous or not logged in users */}
             {!loading && (!user || isAnonymous) && (
               <li>
                 <button
@@ -209,9 +258,9 @@ export default function SideBar() {
           </h3>
           <ul className="space-y-1">
             {DUMMY_LOBBIES.map((lobby) => (
-                <li key={lobby.id}>
-                  <LobbyItem lobby={lobby} />
-                </li>
+              <li key={lobby.id}>
+                <LobbyItem lobby={lobby} />
+              </li>
             ))}
           </ul>
         </div>

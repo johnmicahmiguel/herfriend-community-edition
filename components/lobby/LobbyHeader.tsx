@@ -2,13 +2,7 @@
 
 import React from "react";
 import { Users, Gift } from "lucide-react";
-
-interface LobbyHeaderProps {
-  title: string;
-  category: string;
-  viewers: number;
-  gifts: number;
-}
+import type { LobbyHeaderProps } from "./lobby.types";
 
 export default function LobbyHeader({ title, category, viewers, gifts }: LobbyHeaderProps) {
   return (

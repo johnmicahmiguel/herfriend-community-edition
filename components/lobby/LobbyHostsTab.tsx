@@ -4,62 +4,7 @@ import React from "react";
 import Image from "next/image";
 import { Gift, Star, Mic, X, User } from "lucide-react";
 import UserProfile from "../user/UserProfile";
-
-// Define more specific types for props
-interface Cohost {
-  id: string;
-  name: string;
-  avatar: string;
-  specialty: string;
-  online: boolean;
-}
-
-interface LobbyDataForHosts {
-  hostName: string;
-  hostAvatar: string;
-  hostBio: string;
-  cohosts: Cohost[];
-  hostFollowers?: number;
-  hostFollowing?: number;
-  hostSocialMedia?: {
-    instagram?: string;
-    twitter?: string;
-    tiktok?: string;
-  };
-  hostPosts?: {
-    id: string;
-    image: string;
-    caption: string;
-    likes: number;
-    comments: number;
-    timestamp: string;
-  }[];
-  hostServices?: {
-    title: string;
-    price: string;
-    description: string;
-  }[];
-}
-
-interface LobbyHostsTabProps {
-  showProfileModal: boolean;
-  setShowProfileModal: (show: boolean) => void;
-  profileUserId: string | null;
-  setProfileUserId: (id: string | null) => void;
-  lobbyData: LobbyDataForHosts;
-  speakingUser: string;
-  coHostsMinimized: boolean;
-  setCoHostsMinimized: (minimized: boolean) => void;
-  visibleCoHostId: string | null;
-  handleCoHostClick: (hostId: string) => void;
-  coHostRefs: React.MutableRefObject<{ [key: string]: HTMLDivElement | null }>;
-  showGoalTooltip: boolean;
-  setShowGoalTooltip: (show: boolean) => void;
-  goalTooltipContainerRef: React.RefObject<HTMLDivElement | null>; // Allow null
-  showPinnedTooltip: boolean;
-  setShowPinnedTooltip: (show: boolean) => void;
-  pinnedTooltipContainerRef: React.RefObject<HTMLDivElement | null>; // Allow null
-}
+import type { Cohost, LobbyData, LobbyHostsTabProps } from "./lobby.types";
 
 export default function LobbyHostsTab({
   showProfileModal,
@@ -145,7 +90,7 @@ export default function LobbyHostsTab({
                   }}
                   className="ml-2 text-blue-500 hover:text-blue-700"
                 >
-                  <User size={16} />
+                  <User size={16} className="cursor-pointer" />
                 </button>
               </div>
               <p className="text-sm text-gray-600 mb-2">{lobbyData.hostBio}</p>
@@ -153,9 +98,9 @@ export default function LobbyHostsTab({
               <div className="flex items-center justify-between">
                 <div className="flex space-x-2">
                   <button className="bg-unicef text-white p-2 rounded-full flex items-center justify-center w-10 h-10 shadow-sm hover:shadow transition-all">
-                    <Gift size={18} />
+                    <Gift size={18} className="cursor-pointer" />
                   </button>
-                  <button className="bg-blue-100 text-unicef px-3 py-2 rounded-full text-sm font-medium shadow-sm hover:shadow transition-all">
+                  <button className="bg-blue-100 text-unicef px-3 py-2 rounded-full text-sm font-medium shadow-sm hover:shadow transition-all cursor-pointer">
                     Book
                   </button>
                 </div>
@@ -173,7 +118,7 @@ export default function LobbyHostsTab({
                       </svg>
                     </button>
 
-                    {/* Tooltip/Popover for Lobby Goals - appears on click */}
+                    {/* Tooltip/Popover for Lobby Goals */}
                     <div className={`absolute right-0 mt-1 w-64 z-10 ${showGoalTooltip ? 'opacity-100 visible' : 'opacity-0 invisible'}`}>
                       <div className="relative bg-white rounded-lg shadow-lg border border-blue-200 p-3">
                         {/* Close Button */}
@@ -212,7 +157,7 @@ export default function LobbyHostsTab({
                       </svg>
                     </button>
 
-                    {/* Tooltip/Popover for Pinned Announcement - appears on click */}
+                    {/* Tooltip/Popover for Pinned Announcement */}
                     <div className={`absolute right-0 mt-1 w-64 z-10 ${showPinnedTooltip ? 'opacity-100 visible' : 'opacity-0 invisible'}`}>
                       <div className="relative bg-white rounded-lg shadow-lg border border-amber-200 p-3">
                         {/* Close Button */}
@@ -249,9 +194,8 @@ export default function LobbyHostsTab({
               <div
                 key={host.id}
                 className="relative"
-                // Correct ref assignment: ensure the callback returns void
                 ref={(el) => { coHostRefs.current[host.id] = el; }}
-                onClick={() => handleCoHostClick(host.id)} // Keep onClick handler
+                onClick={() => handleCoHostClick(host.id)}
               >
                 {/* Avatar - make it clickable */}
                 <div className={`w-14 h-14 rounded-full overflow-hidden border-2 ${host.online ? 'border-unicef' : 'border-gray-300'} ${speakingUser === host.name ? 'ring-2 ring-unicef ring-offset-1' : ''} ${!host.online ? 'grayscale opacity-75' : ''} cursor-pointer`}>
@@ -287,15 +231,15 @@ export default function LobbyHostsTab({
                         }}
                         className="ml-1 text-blue-500 hover:text-blue-700"
                       >
-                        <User size={14} />
+                        <User size={14} className="cursor-pointer" />
                       </button>
                     </div>
                     <p className="text-xs text-gray-600 mb-1">{host.specialty}</p>
                     <div className="flex justify-center gap-1 mt-1">
                       <button className={`${host.online ? 'bg-unicef text-white' : 'bg-gray-200 text-gray-500'} p-1 rounded-full`}>
-                        <Gift size={12} />
+                        <Gift size={12} className="cursor-pointer" />
                       </button>
-                      <button className={`${host.online ? 'bg-blue-100 text-unicef' : 'bg-gray-200 text-gray-500'} px-2 py-0.5 rounded-full text-xs`}>
+                      <button className={`${host.online ? 'bg-blue-100 text-unicef' : 'bg-gray-200 text-gray-500'} px-2 py-0.5 rounded-full text-xs cursor-pointer`}>
                         Book
                       </button>
                     </div>
@@ -366,7 +310,7 @@ export default function LobbyHostsTab({
             </svg>
           </button>
 
-          {/* Tooltip/Popover for Pinned Announcement - appears on click */}
+          {/* Tooltip/Popover for Pinned Announcement */}
           <div className={`absolute right-0 mt-1 w-64 z-10 ${showPinnedTooltip ? 'opacity-100 visible' : 'opacity-0 invisible'}`}>
             <div className="relative bg-white rounded-lg shadow-lg border border-amber-200 p-3">
               {/* Close Button */}

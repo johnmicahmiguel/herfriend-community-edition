@@ -9,7 +9,7 @@ import SideBar from "@/components/ui/SideBar";
 import { AgoraClientProvider } from "@/lib/context/agora-client.context";
 import { AgoraCoreProvider } from "@/lib/context/agora-core.context";
 import { AgoraBotsProvider } from "@/lib/context/agora-bots.context";
-
+import { SidebarProvider } from "@/lib/context/sidebar.context";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
@@ -28,28 +28,30 @@ export default function RootLayout({
       <body className={inter.className}>
         <ConsoleOverride />
         <AuthProvider>
-          <AuthLoadingWrapper>
-            <AgoraClientProvider>
-              <AgoraCoreProvider>
-                <AgoraBotsProvider>
-                  <div className="flex flex-col min-h-screen bg-gray-100">
-                    {/* Top Menu Bar */}
-                    <TopMenuBar />
+          <SidebarProvider>
+            <AuthLoadingWrapper>
+              <AgoraClientProvider>
+                <AgoraCoreProvider>
+                  <AgoraBotsProvider>
+                    <div className="flex flex-col min-h-screen bg-gray-100">
+                      {/* Top Menu Bar */}
+                      <TopMenuBar />
 
-                    <div className="flex flex-1">
-                      {/* Sidebar with live lobbies */}
-                      <SideBar />
+                      <div className="flex flex-1">
+                        {/* Sidebar with live lobbies */}
+                        <SideBar />
 
-                      {/* Main content */}
-                      <main className="relative flex-1 flex flex-col overflow-hidden">
-                        {children}
-                      </main>
+                        {/* Main content */}
+                        <main className="relative flex-1 flex flex-col overflow-hidden ml-0 md:ml-64">
+                          {children}
+                        </main>
+                      </div>
                     </div>
-                  </div>
-                </AgoraBotsProvider>
-              </AgoraCoreProvider>
-            </AgoraClientProvider>
-          </AuthLoadingWrapper>
+                  </AgoraBotsProvider>
+                </AgoraCoreProvider>
+              </AgoraClientProvider>
+            </AuthLoadingWrapper>
+          </SidebarProvider>
         </AuthProvider>
       </body>
     </html>

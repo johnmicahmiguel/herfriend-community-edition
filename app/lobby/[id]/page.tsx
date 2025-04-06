@@ -1,34 +1,26 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import UserProfile from "@/components/user/UserProfile";
 import { Users } from "lucide-react";
 import LobbyHeader from "@/components/lobby/LobbyHeader";
-import LobbyHostsTab from "@/components/lobby/LobbyHostsTab";
-import LobbyAboutTab from "@/components/lobby/LobbyAboutTab";
 import LobbyTabs from "@/components/lobby/LobbyTabs";
 import LobbyChat from "@/components/lobby/LobbyChat";
 import LobbySidebar from "@/components/lobby/LobbySidebar";
 
 export default function LobbyPage() {
   const [activeTab, setActiveTab] = useState("hosts");
-  // Track speaking state (in a real app, this would be controlled by audio detection)
   const [speakingUser, setSpeakingUser] = useState("Jane Smith");
-  // State for mobile sidebar visibility
   const [showMobileSidebar, setShowMobileSidebar] = useState(false);
-  // State for minimizing co-host section
   const [coHostsMinimized, setCoHostsMinimized] = useState(false);
-  // State for tooltips visibility (for mobile and desktop click)
   const [showPinnedTooltip, setShowPinnedTooltip] = useState(false);
   const [showGoalTooltip, setShowGoalTooltip] = useState(false);
-  const [visibleCoHostId, setVisibleCoHostId] = useState<string | null>(null); // State for co-host popover
+  const [visibleCoHostId, setVisibleCoHostId] = useState<string | null>(null);
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [profileUserId, setProfileUserId] = useState<string | null>(null);
 
-  // Refs for click outside detection
   const coHostRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
-  const goalTooltipContainerRef = useRef<HTMLDivElement | null>(null); // Ref for the container including button and popover
-  const pinnedTooltipContainerRef = useRef<HTMLDivElement | null>(null); // Ref for the container including button and popover
+  const goalTooltipContainerRef = useRef<HTMLDivElement | null>(null);
+  const pinnedTooltipContainerRef = useRef<HTMLDivElement | null>(null);
 
   // Dummy data for demonstration
   const lobbyData = {
@@ -150,8 +142,8 @@ export default function LobbyPage() {
     { id: "3", user: "Michael", message: "Can you explain more about ecosystems?", avatar: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=1000", time: "7 mins ago" }
   ];
   
-  // Dummy data for top users
-  const topUsers = {
+  // Dummy data for side bar
+  const sideBarData = {
     gifters: [
       { id: "1", name: "David Kim", amount: "$250", avatar: "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?q=80&w=1000" },
       { id: "2", name: "Lisa Wang", amount: "$180", avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=1000" }
@@ -184,38 +176,31 @@ export default function LobbyPage() {
   // Effect for handling clicks outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      // Co-host popover
       if (visibleCoHostId) {
         const clickedCoHostRef = coHostRefs.current[visibleCoHostId];
-        // Check if the click is outside the specific co-host element that's currently open
         if (clickedCoHostRef && !clickedCoHostRef.contains(event.target as Node)) {
           setVisibleCoHostId(null);
         }
       }
 
-      // Goal tooltip
       if (showGoalTooltip && goalTooltipContainerRef.current && !goalTooltipContainerRef.current.contains(event.target as Node)) {
         setShowGoalTooltip(false);
       }
 
-      // Pinned tooltip
       if (showPinnedTooltip && pinnedTooltipContainerRef.current && !pinnedTooltipContainerRef.current.contains(event.target as Node)) {
         setShowPinnedTooltip(false);
       }
     };
 
-    // Add event listener
     document.addEventListener("mousedown", handleClickOutside);
-    // Remove event listener on cleanup
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-    // Dependencies: Re-run if the visibility states change
   }, [visibleCoHostId, showGoalTooltip, showPinnedTooltip]);
 
   return (
     <div className="h-[calc(100vh-80px)] md:h-[calc(100vh-64px)] flex flex-col md:flex-row overflow-hidden bg-gray-50">
-      {/* Main content area - Removed pb-14 since we're using a floating button instead */}
+      {/* Main content area */}
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Header section */}
         <LobbyHeader
@@ -255,12 +240,12 @@ export default function LobbyPage() {
       </div>
 
       {/* Desktop sidebar */}
-      <LobbySidebar topUsers={topUsers} />
+      <LobbySidebar topUsers={sideBarData} />
 
       {/* Mobile sidebar */}
       {showMobileSidebar && (
         <LobbySidebar
-          topUsers={topUsers}
+          topUsers={sideBarData}
           isMobile={true}
           onClose={() => setShowMobileSidebar(false)}
         />

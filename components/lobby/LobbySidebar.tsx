@@ -3,26 +3,7 @@
 import React from "react";
 import Image from "next/image";
 import * as Separator from "@radix-ui/react-separator";
-
-interface TopUser {
-  id: string;
-  name: string;
-  avatar: string;
-  amount?: string;
-  time?: string;
-}
-
-interface TopUsers {
-  gifters: TopUser[];
-  earners: TopUser[];
-  recentJoined: TopUser[];
-}
-
-interface LobbySidebarProps {
-  topUsers: TopUsers;
-  isMobile?: boolean;
-  onClose?: () => void;
-}
+import type { TopUser, TopUsers, LobbySidebarProps } from "./lobby.types";
 
 export default function LobbySidebar({ topUsers, isMobile = false, onClose }: LobbySidebarProps) {
   const sidebarContent = (
@@ -152,7 +133,7 @@ export default function LobbySidebar({ topUsers, isMobile = false, onClose }: Lo
   }
 
   return (
-    <div className="hidden md:block md:w-72 bg-white shadow-sm md:flex-col overflow-hidden">
+    <div className="hidden md:block md:w-72 bg-white shadow-sm md:flex-col overflow-hidden border-l border-gray-200">
       {sidebarContent}
     </div>
   );

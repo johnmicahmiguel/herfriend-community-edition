@@ -1,11 +1,12 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { User, Settings, LogOut, ChevronDown } from "lucide-react";
 import { useAuth } from "@/lib/context/auth.context";
 import { LoginModal } from "@/components/auth/LoginModal";
+import { useSidebar } from "@/lib/context/sidebar.context";
 
 type ProfileDropdownProps = {
   username: string;
@@ -19,9 +20,26 @@ const ProfileDropdown = ({
   onSignOut,
 }: ProfileDropdownProps) => {
   const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setIsOpen(false);
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   return (
-    <div className="relative">
+    <div className="relative" ref={dropdownRef}>
       <button
         className="flex items-center space-x-2"
         onClick={() => setIsOpen(!isOpen)}
@@ -42,6 +60,7 @@ const ProfileDropdown = ({
           <Link
             href="/profile"
             className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+            onClick={() => setIsOpen(false)}
           >
             <User size={16} className="mr-2" />
             Your Profile
@@ -49,13 +68,17 @@ const ProfileDropdown = ({
           <Link
             href="/settings"
             className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+            onClick={() => setIsOpen(false)}
           >
             <Settings size={16} className="mr-2" />
             Settings
           </Link>
           <button
             className="flex items-center w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-            onClick={onSignOut}
+            onClick={async () => {
+              setIsOpen(false);
+              await onSignOut();
+            }}
           >
             <LogOut size={16} className="mr-2" />
             Sign out
@@ -69,6 +92,7 @@ const ProfileDropdown = ({
 const TopMenuBar = () => {
   const { user, isAnonymous, signInWithGoogle, signOut, loading } = useAuth();
   const [loginModalOpen, setLoginModalOpen] = useState(false);
+  const { setIsMobileSidebarOpen } = useSidebar();
 
   // Determine what to show based on auth state
   const renderAuthSection = () => {
@@ -99,9 +123,30 @@ const TopMenuBar = () => {
   };
 
   return (
-    <header className="bg-white shadow-sm w-full z-50 relative">
+    <header className="bg-white shadow-sm w-full z-[60] relative">
       <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16 items-center">
+          {/* Mobile Hamburger Button */}
+          <button
+            className="md:hidden p-2 rounded-md bg-white border border-gray-300 shadow mr-2"
+            onClick={() => setIsMobileSidebarOpen(true)}
+            aria-label="Open sidebar"
+          >
+            <svg
+              className="w-6 h-6 text-gray-800"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M4 6h16M4 12h16M4 18h16"
+              />
+            </svg>
+          </button>
+
           {/* Logo - positioned at extreme left */}
           <div className="flex-shrink-0">
             <Link href="/" className="flex items-center">

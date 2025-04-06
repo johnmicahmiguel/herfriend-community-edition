@@ -4,18 +4,7 @@ import React from "react";
 import Image from "next/image";
 import * as ScrollArea from "@radix-ui/react-scroll-area";
 import { ChevronRight } from "lucide-react";
-
-interface ChatMessage {
-  id: string;
-  user: string;
-  message: string;
-  avatar: string;
-  time: string;
-}
-
-interface LobbyChatProps {
-  chatMessages: ChatMessage[];
-}
+import type { ChatMessage, LobbyChatProps } from "./lobby.types";
 
 export default function LobbyChat({ chatMessages }: LobbyChatProps) {
   return (

@@ -9,14 +9,12 @@ function LobbyCard({ lobby, preventNavigation = false }: LobbyCardProps) {
   const { id, title, hostName, thumbnail, viewers, category, isLive } = lobby;
   const router = useRouter();
 
-  // Handle card click with navigation control
   const handleCardClick = useCallback(() => {
     if (!preventNavigation) {
       router.push(`/lobby/${id}`);
     }
   }, [preventNavigation, router, id]);
 
-  // Handle keyboard navigation
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
       if ((e.key === "Enter" || e.key === " ") && !preventNavigation) {

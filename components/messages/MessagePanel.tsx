@@ -176,7 +176,7 @@ const MessagePanel: React.FC<MessagePanelProps> = ({ open, onClose }) => {
       <>
         {open && (
           <div
-            className={`fixed inset-y-0 right-0 z-50 w-full sm:w-96 bg-white shadow-lg transform transition-transform duration-300 ease-in-out ${
+            className={`fixed inset-y-0 right-0 z-[90] w-full sm:w-96 bg-white shadow-lg transform transition-transform duration-300 ease-in-out ${
               open ? "translate-x-0" : "translate-x-full"
             }`}
           >
@@ -210,7 +210,7 @@ const MessagePanel: React.FC<MessagePanelProps> = ({ open, onClose }) => {
   return (
     <>
       <div
-        className={`fixed inset-y-0 right-0 z-50 w-full sm:w-96 bg-white shadow-lg transform transition-transform duration-300 ease-in-out ${
+        className={`fixed inset-y-0 right-0 z-[90] w-full sm:w-96 bg-white shadow-lg transform transition-transform duration-300 ease-in-out ${
           open ? "translate-x-0" : "translate-x-full"
         }`}
       >

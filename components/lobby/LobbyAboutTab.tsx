@@ -1,11 +1,7 @@
 "use client";
 
 import React from "react";
-
-interface LobbyAboutTabProps {
-  description: string;
-  schedule: string;
-}
+import type { LobbyAboutTabProps } from "./lobby.types";
 
 export default function LobbyAboutTab({ description, schedule }: LobbyAboutTabProps) {
   return (

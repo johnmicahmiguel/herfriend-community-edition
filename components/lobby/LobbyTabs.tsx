@@ -3,89 +3,9 @@
 import React from "react";
 import * as Tabs from "@radix-ui/react-tabs";
 import { Star } from "lucide-react";
-import LobbyHostsTab from "./LobbyHostsTab"; // Import the hosts tab component
-import LobbyAboutTab from "./LobbyAboutTab"; // Import the about tab component
-
-// Re-define necessary props based on what LobbyHostsTab and LobbyAboutTab need
-interface Cohost {
-  id: string;
-  name: string;
-  avatar: string;
-  specialty: string;
-  online: boolean;
-  bio?: string;
-  followers?: number;
-  following?: number;
-  socialMedia?: {
-    instagram?: string;
-    twitter?: string;
-    tiktok?: string;
-  };
-  posts?: {
-    id: string;
-    image: string;
-    caption: string;
-    likes: number;
-    comments: number;
-    timestamp: string;
-  }[];
-  services?: {
-    title: string;
-    price: string;
-    description: string;
-  }[];
-}
-
-interface LobbyDataForTabs {
-  hostName: string;
-  hostAvatar: string;
-  hostBio: string;
-  hostFollowers?: number;
-  hostFollowing?: number;
-  hostSocialMedia?: {
-    instagram?: string;
-    twitter?: string;
-    tiktok?: string;
-  };
-  hostServices?: {
-    title: string;
-    price: string;
-    description: string;
-  }[];
-  hostPosts?: {
-    id: string;
-    image: string;
-    caption: string;
-    likes: number;
-    comments: number;
-    timestamp: string;
-  }[];
-  cohosts: Cohost[];
-  description: string;
-  schedule: string;
-}
-
-interface LobbyTabsProps {
-  activeTab: string;
-  setActiveTab: (tab: string) => void;
-  lobbyData: LobbyDataForTabs; // Use the combined data type
-  speakingUser: string;
-  coHostsMinimized: boolean;
-  setCoHostsMinimized: (minimized: boolean) => void;
-  visibleCoHostId: string | null;
-  handleCoHostClick: (hostId: string) => void;
-  coHostRefs: React.MutableRefObject<{ [key: string]: HTMLDivElement | null }>;
-  showGoalTooltip: boolean;
-  setShowGoalTooltip: (show: boolean) => void;
-  goalTooltipContainerRef: React.RefObject<HTMLDivElement | null>;
-  showPinnedTooltip: boolean;
-  setShowPinnedTooltip: (show: boolean) => void;
-  pinnedTooltipContainerRef: React.RefObject<HTMLDivElement | null>;
-  showProfileModal: boolean;
-  setShowProfileModal: (show: boolean) => void;
-  profileUserId: string | null;
-  setProfileUserId: (id: string | null) => void;
-}
+import LobbyHostsTab from "./LobbyHostsTab";
+import LobbyAboutTab from "./LobbyAboutTab";
+import type { Cohost, LobbyData, LobbyTabsProps } from "./lobby.types";
 
 export default function LobbyTabs({
   activeTab,
@@ -134,7 +54,7 @@ export default function LobbyTabs({
         {/* Tabs content */}
         <Tabs.Content value="hosts" className="p-3 md:p-4 bg-blue-50">
           <LobbyHostsTab
-            lobbyData={lobbyData} // Pass the relevant part of lobbyData
+            lobbyData={lobbyData}
             speakingUser={speakingUser}
             coHostsMinimized={coHostsMinimized}
             setCoHostsMinimized={setCoHostsMinimized}
@@ -156,8 +76,8 @@ export default function LobbyTabs({
 
         <Tabs.Content value="about" className="bg-blue-50 p-3 md:p-4">
           <LobbyAboutTab
-            description={lobbyData.description}
-            schedule={lobbyData.schedule}
+            description={lobbyData.description ?? ""}
+            schedule={lobbyData.schedule ?? ""}
           />
         </Tabs.Content>
       </Tabs.Root>
