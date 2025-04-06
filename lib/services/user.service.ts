@@ -33,7 +33,6 @@ export async function createOrUpdateUser(user: FirebaseUser) {
       uid,
       email,
       username: displayName || `user_${uid.slice(0, 8)}`,
-      uniqueUsername: displayName || `user_${uid.slice(0, 8)}`,
       profilePic,
       createdAt: new Date(),
       updatedAt: new Date(),
@@ -77,7 +76,6 @@ export async function searchUsers(
   users: Array<{
     uid: string;
     username: string;
-    uniqueUsername: string;
     email: string;
     profilePic: string | null;
     createdAt: Date;
@@ -99,7 +97,7 @@ export async function searchUsers(
       OR: [
         { email: { contains: query, mode: "insensitive" as Prisma.QueryMode } },
         {
-          uniqueUsername: {
+          username: {
             contains: query,
             mode: "insensitive" as Prisma.QueryMode,
           },
@@ -120,7 +118,6 @@ export async function searchUsers(
     select: {
       uid: true,
       username: true,
-      uniqueUsername: true,
       email: true,
       profilePic: true,
       createdAt: true,
