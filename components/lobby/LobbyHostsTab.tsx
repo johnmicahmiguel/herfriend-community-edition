@@ -3,7 +3,7 @@
 import React from "react";
 import Image from "next/image";
 import { Gift, Star, Mic, X, User } from "lucide-react";
-import UserProfile from "../user/UserProfile";
+import UserProfileModal from "../user/UserProfileModal";
 import type { Cohost, LobbyData, LobbyHostsTabProps } from "./lobby.types";
 
 export default function LobbyHostsTab({
@@ -335,7 +335,7 @@ export default function LobbyHostsTab({
       </div>
       {showProfileModal && (
         profileUserId === 'host' ? (
-          <UserProfile 
+          <UserProfileModal 
             user={{
               id: 'host',
               name: lobbyData.hostName,
@@ -352,7 +352,7 @@ export default function LobbyHostsTab({
             open={showProfileModal}
           />
         ) : (
-          <UserProfile 
+          <UserProfileModal 
             user={lobbyData.cohosts.find(h => h.id === profileUserId)!}
             onClose={() => setShowProfileModal(false)}
             open={showProfileModal}

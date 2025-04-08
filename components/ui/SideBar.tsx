@@ -198,7 +198,7 @@ export default function SideBar() {
             <li>
               <Link
                 href="/"
-                className="flex items-center space-x-3 p-2 rounded-md hover:bg-gray-100 transition-colors dark:hover:bg-gray-800"
+                className="cursor-pointer flex items-center space-x-3 p-2 rounded-md hover:bg-gray-100 transition-colors dark:hover:bg-gray-800"
               >
                 <Home size={20} className="text-gray-700 dark:text-gray-400" />
                 <span className="font-medium text-base dark:text-gray-200">Home</span>
@@ -208,7 +208,7 @@ export default function SideBar() {
             <li>
               <button
                 onClick={toggleMessagesPanel}
-                className="flex items-center space-x-3 p-2 w-full text-left rounded-md hover:bg-gray-100 transition-colors relative dark:hover:bg-gray-800"
+                className="cursor-pointer flex items-center space-x-3 p-2 w-full text-left rounded-md hover:bg-gray-100 transition-colors relative dark:hover:bg-gray-800"
               >
                 <MessageSquare size={20} className="text-gray-700 dark:text-gray-400" />
                 <span className="font-medium text-base dark:text-gray-200">Messages</span>
@@ -225,10 +225,23 @@ export default function SideBar() {
               <li>
                 <Link
                   href="/missions"
-                  className="flex items-center space-x-3 p-2 rounded-md hover:bg-gray-100 transition-colors dark:hover:bg-gray-800"
+                  className="cursor-pointer flex items-center space-x-3 p-2 rounded-md hover:bg-gray-100 transition-colors dark:hover:bg-gray-800"
                 >
-                  <Trophy size={20} className="text-yellow-500 dark:text-yellow-400" />
+                  <Trophy size={20} className="text-gray-700 dark:text-gray-400" />
                   <span className="font-medium text-base dark:text-gray-200">Mission Center</span>
+                </Link>
+              </li>
+            )}
+
+            {/* Wallet - Only show for authenticated users */}
+            {!loading && user && !isAnonymous && (
+              <li>
+                <Link
+                  href="/wallet"
+                  className="cursor-pointer flex items-center space-x-3 p-2 rounded-md hover:bg-gray-100 transition-colors dark:hover:bg-gray-800"
+                >
+                  <Wallet size={20} className="text-gray-700 dark:text-gray-400" />
+                  <span className="font-medium text-base dark:text-gray-200">My Wallet</span>
                 </Link>
               </li>
             )}
@@ -238,7 +251,7 @@ export default function SideBar() {
               <li>
                 <button
                   onClick={() => setLoginModalOpen(true)}
-                  className="flex items-center space-x-3 p-2 w-full text-left rounded-md hover:bg-gray-100 transition-colors dark:hover:bg-gray-800"
+                  className="cursor-pointer flex items-center space-x-3 p-2 w-full text-left rounded-md hover:bg-gray-100 transition-colors dark:hover:bg-gray-800"
                 >
                   <LogIn size={20} className="text-blue-500" />
                   <span className="font-medium text-base text-blue-500 dark:text-blue-400">
@@ -253,7 +266,7 @@ export default function SideBar() {
               <li>
                 <button
                   onClick={signOut}
-                  className="flex items-center space-x-3 p-2 w-full text-left rounded-md hover:bg-gray-100 transition-colors dark:hover:bg-gray-800"
+                  className="cursor-pointer flex items-center space-x-3 p-2 w-full text-left rounded-md hover:bg-gray-100 transition-colors dark:hover:bg-gray-800"
                 >
                   <LogOut size={20} className="text-red-500 dark:text-red-400" />
                   <span className="font-medium text-base text-red-500 dark:text-red-400">

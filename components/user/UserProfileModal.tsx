@@ -38,7 +38,7 @@ interface UserProfileProps {
   open: boolean;
 }
 
-export default function UserProfile({ user, onClose, open }: UserProfileProps) {
+export default function UserProfileModal({ user, onClose, open }: UserProfileProps) {
   return (
     <Dialog.Root open={open} onOpenChange={(open) => !open && onClose()}>
       <Dialog.Portal>

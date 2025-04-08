@@ -348,7 +348,7 @@ export default function LobbyPage() {
             {!loading && user && !isAnonymous && (
               <button 
                 onClick={() => setMissionCenterOpen(true)}
-                className="relative bg-yellow-500 text-white rounded-full p-2 shadow-lg hover:shadow-xl transition-shadow" 
+                className="relative bg-yellow-500 text-white rounded-full p-2 shadow-lg hover:shadow-xl transition-shadow cursor-pointer" 
                 aria-label="View Mission Center"
               >
                 <Trophy size={18} />

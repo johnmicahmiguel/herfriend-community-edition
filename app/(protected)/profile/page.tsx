@@ -14,7 +14,7 @@ const mockUser = {
   posts: [
     {
       id: "post1",
-      image: "/images/logo-horizontal.png",
+      image: "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?q=80&w=1000",
       caption: "Excited to join this platform!",
       likes: 34,
       comments: 5,

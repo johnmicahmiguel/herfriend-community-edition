@@ -75,6 +75,12 @@ export default function UserProfileContent({ user, className = "" }: UserProfile
                 <span className="font-semibold">{user.following || 0}</span> following
               </div>
             </div>
+
+            {user.bio && (
+              <p className="mt-3 text-sm text-gray-700 dark:text-gray-300">
+                {user.bio}
+              </p>
+            )}
           </div>
         </div>
 
@@ -131,7 +137,7 @@ export default function UserProfileContent({ user, className = "" }: UserProfile
             value="about"
             className={`flex-1 py-3 text-sm font-medium ${activeTab === "about" ? "text-blue-500 border-b-2 border-blue-500 relative -mb-[2px]" : "text-gray-600 dark:text-gray-300"}`}
           >
-            About
+            More
           </Tabs.Trigger>
         </Tabs.List>
 

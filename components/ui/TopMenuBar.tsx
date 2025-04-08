@@ -42,7 +42,7 @@ const ProfileDropdown = ({
   return (
     <div className="relative" ref={dropdownRef}>
       <button
-        className="flex items-center space-x-2"
+        className="cursor-pointer flex items-center space-x-2"
         onClick={() => setIsOpen(!isOpen)}
       >
         <div className="w-8 h-8 rounded-full overflow-hidden flex items-center justify-center">
@@ -75,7 +75,7 @@ const ProfileDropdown = ({
             Settings
           </Link>
           <button
-            className="flex items-center w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700"
+            className="cursor-pointer flex items-center w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700"
             onClick={async () => {
               setIsOpen(false);
               await onSignOut();
@@ -112,7 +112,7 @@ const TopMenuBar = () => {
       return (
         <button
           onClick={() => setLoginModalOpen(true)}
-          className="px-4 py-2 text-white rounded bg-blue-500 hover:bg-opacity-90 dark:bg-blue-600 dark:hover:bg-blue-700"
+          className="cursor-pointer px-4 py-2 text-white rounded bg-blue-500 hover:bg-opacity-90 dark:bg-blue-600 dark:hover:bg-blue-700"
         >
           Sign In
         </button>

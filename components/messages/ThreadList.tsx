@@ -6,8 +6,15 @@ import { formatDistanceToNow } from "date-fns";
 import { ThreadListProps, MessageThreadWithDates } from "@/types/messages";
 
 // Format date to relative time (e.g., "2 hours ago")
-const formatRelativeTime = (date: Date): string => {
-  return formatDistanceToNow(date, { addSuffix: true });
+const formatRelativeTime = (date: Date | undefined): string => {
+  // Handle potentially undefined date
+  if (!date) return "";
+  try {
+     return formatDistanceToNow(date, { addSuffix: true });
+  } catch (error) {
+    console.error("Error formatting date:", date, error);
+    return "Invalid date";
+  }
 };
 
 // Thread list item component
@@ -18,29 +25,29 @@ const ThreadItem: React.FC<{
 }> = ({ thread, isActive, onClick }) => {
   return (
     <div
-      className={`flex items-start gap-3 p-3 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors ${
-        isActive ? "bg-gray-100 dark:bg-gray-700" : ""
+      className={`flex items-start gap-3 p-3 cursor-pointer hover:bg-blue-50 dark:hover:bg-gray-800 transition-colors ${
+        isActive ? "bg-blue-100 dark:bg-gray-800" : ""
       }`}
       onClick={onClick}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') onClick(); }}
     >
       {/* User Avatar */}
       <div className="relative flex-shrink-0">
         <div className="w-12 h-12 rounded-full overflow-hidden">
           <Image
-            src={
-              thread.otherUserPhoto ||
-              "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=facearea&facepad=2&w=256&h=256&q=80&sat=-100"
-            }
-            alt="User Avatar"
+            src={thread.otherUserPhoto || "https://images.unsplash.com/photo-1517841905240-472988babdf9?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"}
+            alt={`${thread.otherUserName}'s avatar`}
             width={48}
             height={48}
-            className="object-cover"
+            className="object-cover bg-gray-200"
           />
         </div>
 
         {/* Unread indicator */}
         {thread.unreadCount > 0 && (
-          <div className="absolute -top-1 -right-1 flex items-center justify-center w-5 h-5 bg-blue-500 text-white text-xs font-bold rounded-full">
+          <div className="absolute -top-1 -right-1 flex items-center justify-center w-5 h-5 bg-blue-500 text-white text-xs font-bold rounded-full ring-2 ring-white dark:ring-gray-800">
             {thread.unreadCount > 9 ? "9+" : thread.unreadCount}
           </div>
         )}
@@ -50,15 +57,16 @@ const ThreadItem: React.FC<{
       <div className="flex-1 min-w-0">
         <div className="flex justify-between items-baseline">
           <h3 className="font-medium text-gray-900 dark:text-gray-100 truncate">
-            {thread.otherUserName}
+            {thread.otherUserName || "Unknown User"}
           </h3>
           <span className="text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">
-            {formatRelativeTime(thread.lastTimestamp)}
+            {formatRelativeTime(thread.updatedAt || thread.lastTimestamp)}
           </span>
         </div>
 
         <p
           className={`text-sm truncate ${thread.unreadCount > 0 ? "font-medium text-gray-900 dark:text-gray-100" : "text-gray-600 dark:text-gray-400"}`}
+          title={thread.lastMessage || ""}
         >
           {thread.lastMessage || "Start a conversation"}
         </p>
@@ -67,28 +75,22 @@ const ThreadItem: React.FC<{
   );
 };
 
-const ThreadList: React.FC<ThreadListProps> = ({
+// Simplified ThreadListProps if isLoading is removed
+interface SimplifiedThreadListProps {
+  threads: MessageThreadWithDates[];
+  selectedThreadId: string | null;
+  onSelectThread: (thread: MessageThreadWithDates) => void;
+}
+
+const ThreadList: React.FC<SimplifiedThreadListProps> = ({
   threads,
   selectedThreadId,
   onSelectThread,
-  isLoading,
 }) => {
-  if (isLoading) {
-    return (
-      <div className="flex flex-col h-full">
-        <div className="flex-1 overflow-y-auto">
-          <div className="flex justify-center items-center h-full">
-            <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   if (threads.length === 0) {
     return (
       <div className="flex flex-col h-full">
-        <div className="flex-1 overflow-y-auto">
+        <div className="flex-1 overflow-y-auto bg-blue-50 dark:bg-gray-900">
           <div className="flex flex-col justify-center items-center h-full p-4 text-center">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -96,6 +98,7 @@ const ThreadList: React.FC<ThreadListProps> = ({
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
+              aria-hidden="true"
             >
               <path
                 strokeLinecap="round"
@@ -108,7 +111,7 @@ const ThreadList: React.FC<ThreadListProps> = ({
               No messages yet
             </h3>
             <p className="text-sm text-gray-500 dark:text-gray-400">
-              Start a new conversation by clicking the message icon above
+              Start a new conversation to see it here.
             </p>
           </div>
         </div>
@@ -119,7 +122,7 @@ const ThreadList: React.FC<ThreadListProps> = ({
   return (
     <div className="flex flex-col h-full">
       <div className="flex-1 overflow-y-auto">
-        <div className="divide-y divide-gray-200 dark:divide-gray-700">
+        <div className="divide-y divide-blue-100 dark:divide-gray-800">
           {threads.map((thread) => (
             <ThreadItem
               key={thread.threadId}
