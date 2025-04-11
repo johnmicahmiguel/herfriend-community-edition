@@ -1,9 +1,11 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import Image from "next/image";
 import { Gift, Star, Mic, X, User } from "lucide-react";
 import UserProfileModal from "../user/UserProfileModal";
+import BookingRequestForm from "../messages/BookingRequestForm";
+import * as Dialog from "@radix-ui/react-dialog";
 import type { Cohost, LobbyData, LobbyHostsTabProps } from "./lobby.types";
 
 export default function LobbyHostsTab({
@@ -25,6 +27,37 @@ export default function LobbyHostsTab({
   setShowPinnedTooltip,
   pinnedTooltipContainerRef,
 }: LobbyHostsTabProps) {
+  // Add state for booking form
+  const [showBookingForm, setShowBookingForm] = useState(false);
+  const [bookingHost, setBookingHost] = useState<{
+    id: string;
+    name: string;
+    avatar: string;
+    services?: Array<{title: string, price: string, description: string}>;
+  } | null>(null);
+
+  // Handle booking dialog open
+  const handleBookClick = (host: any, isMainHost = false) => {
+    setBookingHost({
+      id: isMainHost ? 'host' : host.id,
+      name: isMainHost ? lobbyData.hostName : host.name,
+      avatar: isMainHost ? lobbyData.hostAvatar : host.avatar,
+      services: isMainHost ? lobbyData.hostServices : host.services
+    });
+    setShowBookingForm(true);
+  };
+
+  // Handle booking request submission
+  const handleBookingRequest = (bookingData: any, note?: string) => {
+    console.log("Creating booking request:", bookingData, note);
+    console.log("For host:", bookingHost);
+    // In a real implementation, this would:
+    // 1. Save booking data to database
+    // 2. Create a booking message in the chat (if messaging the host)
+    // 3. Notify the host
+    setShowBookingForm(false);
+  };
+
   return (
     <>
       <div className="bg-blue-50 dark:bg-gray-800 rounded-lg">
@@ -100,7 +133,10 @@ export default function LobbyHostsTab({
                   <button className="bg-blue-500 text-white p-2 rounded-full flex items-center justify-center w-10 h-10 shadow-sm hover:shadow transition-all">
                     <Gift size={18} className="cursor-pointer" />
                   </button>
-                  <button className="bg-blue-100 dark:bg-blue-900 text-blue-500 dark:text-blue-300 px-3 py-2 rounded-full text-sm font-medium shadow-sm hover:shadow transition-all cursor-pointer">
+                  <button 
+                    onClick={() => handleBookClick(null, true)}
+                    className="bg-blue-100 dark:bg-blue-900 text-blue-500 dark:text-blue-300 px-3 py-2 rounded-full text-sm font-medium shadow-sm hover:shadow transition-all cursor-pointer"
+                  >
                     Book
                   </button>
                 </div>
@@ -239,7 +275,15 @@ export default function LobbyHostsTab({
                       <button className={`${host.online ? 'bg-blue-500 text-white' : 'bg-gray-200 dark:bg-gray-600 text-gray-500 dark:text-gray-400'} p-1 rounded-full`}>
                         <Gift size={12} className="cursor-pointer" />
                       </button>
-                      <button className={`${host.online ? 'bg-blue-100 dark:bg-blue-900 text-blue-500 dark:text-blue-300' : 'bg-gray-200 dark:bg-gray-600 text-gray-500 dark:text-gray-400'} px-2 py-0.5 rounded-full text-xs cursor-pointer`}>
+                      <button 
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (host.online) {
+                            handleBookClick(host);
+                          }
+                        }}
+                        className={`${host.online ? 'bg-blue-100 dark:bg-blue-900 text-blue-500 dark:text-blue-300' : 'bg-gray-200 dark:bg-gray-600 text-gray-500 dark:text-gray-400'} px-2 py-0.5 rounded-full text-xs cursor-pointer`}
+                      >
                         Book
                       </button>
                     </div>
@@ -333,6 +377,8 @@ export default function LobbyHostsTab({
         </div>
       </div>
       </div>
+
+      {/* User Profile Modal */}
       {showProfileModal && (
         profileUserId === 'host' ? (
           <UserProfileModal 
@@ -359,6 +405,26 @@ export default function LobbyHostsTab({
           />
         )
       )}
+
+      {/* Booking Form Dialog */}
+      <Dialog.Root open={showBookingForm} onOpenChange={setShowBookingForm}>
+        {bookingHost && (
+          <Dialog.Portal>
+            <BookingRequestForm 
+              hostId={bookingHost.id}
+              hostName={bookingHost.name}
+              hostAvatar={bookingHost.avatar}
+              services={bookingHost.services?.map(service => ({
+                title: service.title,
+                price: service.price,
+                description: service.description
+              }))}
+              onSubmit={handleBookingRequest}
+              onCancel={() => setShowBookingForm(false)}
+            />
+          </Dialog.Portal>
+        )}
+      </Dialog.Root>
     </>
   );
 }

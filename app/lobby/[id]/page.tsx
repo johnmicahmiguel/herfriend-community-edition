@@ -11,6 +11,8 @@ import { useAuth } from "@/lib/context/auth.context";
 import MissionCenterContent from "@/components/user/MissionCenterContent";
 import { Mission, UserLevel } from "@/components/user/MissionTypes"; // Import types
 import type { ChatMessage } from "@/components/lobby/lobby.types"; // Import type
+import BookingNotification from "@/components/user/BookingNotification";
+import { getNextUpcomingBooking } from "@/app/(protected)/bookings/page";
 
 // Mock data for Mission Center (replace with actual data fetching later)
 const mockDailyMissions: Mission[] = [
@@ -110,6 +112,8 @@ export default function LobbyPage() {
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [profileUserId, setProfileUserId] = useState<string | null>(null);
   const [missionCenterOpen, setMissionCenterOpen] = useState(false);
+  const [showBookingNotification, setShowBookingNotification] = useState(false);
+  const [nextBooking, setNextBooking] = useState(getNextUpcomingBooking());
 
   const coHostRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
   const goalTooltipContainerRef = useRef<HTMLDivElement | null>(null);
@@ -292,6 +296,18 @@ export default function LobbyPage() {
     };
   }, [visibleCoHostId, showGoalTooltip, showPinnedTooltip]);
 
+  // Effect to check for upcoming bookings
+  useEffect(() => {
+    if (!loading && user && !isAnonymous) {
+      // In a real app, this would fetch from an API
+      const upcomingBooking = getNextUpcomingBooking();
+      if (upcomingBooking) {
+        setNextBooking(upcomingBooking);
+        setShowBookingNotification(true);
+      }
+    }
+  }, [loading, user, isAnonymous]);
+
   return (
     <div className="h-[calc(100vh-80px)] md:h-[calc(100vh-64px)] flex flex-col md:flex-row overflow-hidden bg-gray-50 dark:bg-gray-900 relative">
       {/* Main content area */}
@@ -344,17 +360,27 @@ export default function LobbyPage() {
               </button>
             </div>
 
-            {/* Mission Center Button (Authenticated users only) */}
+            {/* Notification Buttons Row */}
             {!loading && user && !isAnonymous && (
-              <button 
-                onClick={() => setMissionCenterOpen(true)}
-                className="relative bg-yellow-500 text-white rounded-full p-2 shadow-lg hover:shadow-xl transition-shadow cursor-pointer" 
-                aria-label="View Mission Center"
-              >
-                <Trophy size={18} />
-                {/* Notification Dot - Conditionally render this later */}
-                <span className="absolute -top-0.5 -right-0.5 block h-2.5 w-2.5 rounded-full bg-red-500 ring-2 ring-white dark:ring-gray-900" />
-              </button>
+              <div className="flex gap-2">
+                {/* Booking Notification Button */}
+                {showBookingNotification && nextBooking && (
+                  <BookingNotification 
+                    booking={nextBooking}
+                    visible={showBookingNotification}
+                    onDismiss={() => setShowBookingNotification(false)}
+                  />
+                )}
+                
+                {/* Mission Center Button */}
+                <button 
+                  onClick={() => setMissionCenterOpen(true)}
+                  className="bg-yellow-500 text-white rounded-full p-2 shadow-lg hover:shadow-xl transition-shadow cursor-pointer" 
+                  aria-label="View Mission Center"
+                >
+                  <Trophy size={18} />
+                </button>
+              </div>
             )}
           </div>
         </div>

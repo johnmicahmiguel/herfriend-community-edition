@@ -14,6 +14,7 @@ import {
   Construction,
   LayoutDashboard,
   Trophy,
+  Calendar,
 } from "lucide-react";
 import { useAuth } from "@/lib/context/auth.context";
 import { LoginModal } from "@/components/auth/LoginModal";
@@ -229,6 +230,19 @@ export default function SideBar() {
                 >
                   <Trophy size={20} className="text-gray-700 dark:text-gray-400" />
                   <span className="font-medium text-base dark:text-gray-200">Mission Center</span>
+                </Link>
+              </li>
+            )}
+
+            {/* My Bookings - Only show for authenticated users */}
+            {!loading && user && !isAnonymous && (
+              <li>
+                <Link
+                  href="/bookings"
+                  className="cursor-pointer flex items-center space-x-3 p-2 rounded-md hover:bg-gray-100 transition-colors dark:hover:bg-gray-800"
+                >
+                  <Calendar size={20} className="text-gray-700 dark:text-gray-400" />
+                  <span className="font-medium text-base dark:text-gray-200">My Bookings</span>
                 </Link>
               </li>
             )}

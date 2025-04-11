@@ -36,8 +36,8 @@ export default function TopUpDialog({ open, onOpenChange, onPurchase }: TopUpDia
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
       <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0 bg-black/50 z-50" />
-        <Dialog.Content className="fixed top-[50%] left-[50%] max-h-[90vh] w-[90vw] max-w-[500px] translate-x-[-50%] translate-y-[-50%] bg-white dark:bg-gray-800 rounded-lg shadow-lg z-50 overflow-hidden flex flex-col">
+        <Dialog.Overlay className="fixed inset-0 bg-black/50 z-[60]" />
+        <Dialog.Content className="fixed top-[50%] left-[50%] max-h-[90vh] w-[90vw] max-w-[500px] translate-x-[-50%] translate-y-[-50%] bg-white dark:bg-gray-800 rounded-lg shadow-lg z-[70] overflow-hidden flex flex-col">
           <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Diamond className="text-blue-500" size={20} />
@@ -136,4 +136,4 @@ export default function TopUpDialog({ open, onOpenChange, onPurchase }: TopUpDia
       </Dialog.Portal>
     </Dialog.Root>
   );
-} 
+}
