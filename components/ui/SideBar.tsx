@@ -28,7 +28,7 @@ import { usePathname } from "next/navigation";
 // Dummy data for lobbies (Copied from LobbyGrid for now)
 const DUMMY_LOBBIES: Lobby[] = [
     {
-    id: "670e40bd2aebcc000732a4e6",
+    id: "VIDEO_LOBBY",
     title: "Social Experience with Nature",
     hostName: "Nature",
     thumbnail: "https://images.unsplash.com/photo-1519125323398-675f0ddb6308?q=80&w=1000",
@@ -37,7 +37,7 @@ const DUMMY_LOBBIES: Lobby[] = [
     isLive: true,
   },
   {
-    id: "2",
+    id: "VOICE_LOBBY",
     title: "Clean Water Initiative",
     hostName: "WASH Program",
     thumbnail:

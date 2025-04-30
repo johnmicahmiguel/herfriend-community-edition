@@ -12,7 +12,14 @@ import MissionCenterContent from "@/components/user/MissionCenterContent";
 import { Mission, UserLevel } from "@/components/user/MissionTypes"; // Import types
 import type { ChatMessage } from "@/components/lobby/lobby.types"; // Import type
 import BookingNotification from "@/components/user/BookingNotification";
-import { getNextUpcomingBooking } from "@/app/(protected)/bookings/page";
+import { getNextUpcomingBooking } from "@/app/(protected)/bookings/mockBookings";
+import LobbyVideoPlayer from "@/components/lobby/LobbyVideoPlayer";
+import LobbyLeftSidebar from "@/components/lobby/LobbyLeftSidebar";
+import LobbyRightSidebar from "@/components/lobby/LobbyRightSidebar";
+import LobbyVideoOverlay from "@/components/lobby/LobbyVideoOverlay";
+import { useParams } from "next/navigation";
+import HostAvatarCircle from "@/components/lobby/HostAvatarCircle";
+import LobbyVoiceContent from "@/components/lobby/LobbyVoiceContent";
 
 // Mock data for Mission Center (replace with actual data fetching later)
 const mockDailyMissions: Mission[] = [
@@ -114,10 +121,14 @@ export default function LobbyPage() {
   const [missionCenterOpen, setMissionCenterOpen] = useState(false);
   const [showBookingNotification, setShowBookingNotification] = useState(false);
   const [nextBooking, setNextBooking] = useState(getNextUpcomingBooking());
+  const [showVideoOverlay, setShowVideoOverlay] = useState(false);
 
   const coHostRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
   const goalTooltipContainerRef = useRef<HTMLDivElement | null>(null);
   const pinnedTooltipContainerRef = useRef<HTMLDivElement | null>(null);
+
+  const params = useParams();
+  const lobbyId = params?.id as string;
 
   // Dummy data for demonstration
   const lobbyData = {
@@ -226,6 +237,71 @@ export default function LobbyPage() {
             description: "Expert consultation on environmental research projects."
           }
         ]
+      },
+      {
+        id: "3",
+        name: "Liam Chen",
+        avatar: "https://images.unsplash.com/photo-1511367461989-f85a21fda167?q=80&w=1000",
+        specialty: "Botanist",
+        online: true,
+        bio: "Plant lover and botany educator.",
+        followers: 540,
+        following: 60,
+        socialMedia: {},
+        posts: [],
+        services: []
+      },
+      {
+        id: "4",
+        name: "Ava Patel",
+        avatar: "https://images.unsplash.com/photo-1517841905240-472988babdf9?q=80&w=1000",
+        specialty: "Ecologist",
+        online: true,
+        bio: "Ecology researcher and fieldwork enthusiast.",
+        followers: 320,
+        following: 80,
+        socialMedia: {},
+        posts: [],
+        services: []
+      },
+      {
+        id: "5",
+        name: "Noah Kim",
+        avatar: "https://images.unsplash.com/photo-1465101046530-73398c7f28ca?q=80&w=1000",
+        specialty: "Marine biologist",
+        online: false,
+        bio: "Studying ocean life and coral reefs.",
+        followers: 410,
+        following: 55,
+        socialMedia: {},
+        posts: [],
+        services: []
+      },
+      {
+        id: "6",
+        name: "Sophia Rossi",
+        avatar: "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?q=80&w=1000",
+        specialty: "Climate activist",
+        online: true,
+        bio: "Advocating for climate action worldwide.",
+        followers: 980,
+        following: 120,
+        socialMedia: {},
+        posts: [],
+        services: []
+      },
+      {
+        id: "8",
+        name: "Emily Nguyen",
+        avatar: "https://images.unsplash.com/photo-1519125323398-675f0ddb6308?q=80&w=1000",
+        specialty: "Zoologist",
+        online: true,
+        bio: "Studying animal behavior and habitats.",
+        followers: 600,
+        following: 70,
+        socialMedia: {},
+        posts: [],
+        services: []
       }
     ],
     viewers: 1245,
@@ -308,19 +384,117 @@ export default function LobbyPage() {
     }
   }, [loading, user, isAnonymous]);
 
+  // VOICE LOBBY UI
+  if (lobbyId === "VOICE_LOBBY") {
+    return (
+      <div className="h-[calc(100vh-80px)] md:h-[calc(100vh-64px)] flex flex-col md:flex-row overflow-hidden bg-gray-50 dark:bg-gray-900 relative">
+        {/* Main content area */}
+        <div className="flex-1 flex flex-col overflow-hidden">
+          {/* Voice Lobby Content */}
+          <LobbyVoiceContent
+            host={{
+              name: lobbyData.hostName,
+              avatar: lobbyData.hostAvatar,
+            }}
+            cohosts={lobbyData.cohosts}
+          />
+          {/* Tabs (Hosts, About) */}
+          <div className="flex-1 flex flex-col overflow-hidden relative">
+            <LobbyTabs
+              activeTab={activeTab}
+              setActiveTab={setActiveTab}
+              lobbyData={lobbyData}
+              speakingUser={speakingUser}
+              coHostsMinimized={coHostsMinimized}
+              setCoHostsMinimized={setCoHostsMinimized}
+              visibleCoHostId={visibleCoHostId}
+              handleCoHostClick={handleCoHostClick}
+              coHostRefs={coHostRefs}
+              showGoalTooltip={showGoalTooltip}
+              setShowGoalTooltip={setShowGoalTooltip}
+              goalTooltipContainerRef={goalTooltipContainerRef}
+              showPinnedTooltip={showPinnedTooltip}
+              setShowPinnedTooltip={setShowPinnedTooltip}
+              pinnedTooltipContainerRef={pinnedTooltipContainerRef}
+              showProfileModal={showProfileModal}
+              setShowProfileModal={setShowProfileModal}
+              profileUserId={profileUserId}
+              setProfileUserId={setProfileUserId}
+              hideHostsTab={true}
+            />
+          </div>
+        </div>
+        {/* Right Sidebar (Top Users, Gifts, Missions, Chat) */}
+        <div className="hidden md:block md:w-96 bg-white dark:bg-gray-800 shadow-sm md:flex-col overflow-hidden border-l border-gray-200 dark:border-gray-700">
+          <LobbyRightSidebar topUsers={sideBarData} chatMessages={chatMessages} />
+        </div>
+        {/* Mobile sidebar */}
+        {showMobileSidebar && (
+          <LobbySidebar
+            topUsers={sideBarData}
+            isMobile={true}
+            onClose={() => setShowMobileSidebar(false)}
+          />
+        )}
+        {/* Mission Center Dialog */}
+        <Dialog.Root open={missionCenterOpen} onOpenChange={setMissionCenterOpen}>
+          <Dialog.Portal>
+            <Dialog.Overlay className="fixed inset-0 bg-black/50 z-50" />
+            <Dialog.Content className="fixed top-[50%] left-[50%] max-h-[90vh] w-[90vw] max-w-[800px] translate-x-[-50%] translate-y-[-50%] bg-white dark:bg-gray-800 rounded-lg shadow-lg z-50 overflow-hidden flex flex-col">
+              <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Award className="text-amber-500" size={20} />
+                  <Dialog.Title className="text-lg font-bold text-gray-800 dark:text-gray-100">
+                    Mission Center
+                  </Dialog.Title>
+                </div>
+                <Dialog.Close asChild>
+                  <button className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+                    <X size={20} />
+                  </button>
+                </Dialog.Close>
+              </div>
+              <div className="flex-1 overflow-y-auto no-scrollbar">
+                <MissionCenterContent 
+                  dailyMissions={mockDailyMissions}
+                  weeklyMissions={mockWeeklyMissions}
+                  onetimeMissions={mockOnetimeMissions}
+                  userLevel={mockUserLevel}
+                />
+              </div>
+            </Dialog.Content>
+          </Dialog.Portal>
+        </Dialog.Root>
+      </div>
+    );
+  }
+
   return (
     <div className="h-[calc(100vh-80px)] md:h-[calc(100vh-64px)] flex flex-col md:flex-row overflow-hidden bg-gray-50 dark:bg-gray-900 relative">
       {/* Main content area */}
       <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Header section */}
-        <LobbyHeader
-          title={lobbyData.title}
-          category={lobbyData.category}
-          viewers={lobbyData.viewers}
-          gifts={lobbyData.gifts}
-        />
-
-        {/* Main content tabs and chat - Added relative positioning */}
+        {/* Video Player */}
+        <div
+          className="relative"
+          onMouseEnter={() => setShowVideoOverlay(true)}
+          onMouseLeave={() => setShowVideoOverlay(false)}
+        >
+          <LobbyVideoPlayer />
+          {showVideoOverlay && (
+            <LobbyVideoOverlay
+              hostAvatar={lobbyData.hostAvatar}
+              hostName={lobbyData.hostName}
+              viewers={lobbyData.viewers}
+              title={lobbyData.title}
+              category={lobbyData.category}
+              showGoalTooltip={showGoalTooltip}
+              setShowGoalTooltip={setShowGoalTooltip}
+              showPinnedTooltip={showPinnedTooltip}
+              setShowPinnedTooltip={setShowPinnedTooltip}
+            />
+          )}
+        </div>
+        {/* Tabs (Hosts, About) */}
         <div className="flex-1 flex flex-col overflow-hidden relative">
           <LobbyTabs
             activeTab={activeTab}
@@ -343,51 +517,13 @@ export default function LobbyPage() {
             profileUserId={profileUserId}
             setProfileUserId={setProfileUserId}
           />
-          
-          {/* Chat section */}
-          <LobbyChat chatMessages={chatMessages} />
-
-          {/* Floating Buttons Container - Positioned above chat input */}
-          <div className="absolute bottom-20 right-4 z-10 flex flex-col items-end gap-3">
-            {/* Mobile Top Users button */}
-            <div className="md:hidden">
-              <button 
-                onClick={() => setShowMobileSidebar(true)}
-                className="bg-blue-500 text-white rounded-full p-2 shadow-lg hover:shadow-xl transition-shadow" 
-                aria-label="View Top Users"
-              >
-                <Users size={18} />
-              </button>
-            </div>
-
-            {/* Notification Buttons Row */}
-            {!loading && user && !isAnonymous && (
-              <div className="flex gap-2">
-                {/* Booking Notification Button */}
-                {showBookingNotification && nextBooking && (
-                  <BookingNotification 
-                    booking={nextBooking}
-                    visible={showBookingNotification}
-                    onDismiss={() => setShowBookingNotification(false)}
-                  />
-                )}
-                
-                {/* Mission Center Button */}
-                <button 
-                  onClick={() => setMissionCenterOpen(true)}
-                  className="bg-yellow-500 text-white rounded-full p-2 shadow-lg hover:shadow-xl transition-shadow cursor-pointer" 
-                  aria-label="View Mission Center"
-                >
-                  <Trophy size={18} />
-                </button>
-              </div>
-            )}
-          </div>
         </div>
       </div>
 
-      {/* Desktop sidebar */}
-      <LobbySidebar topUsers={sideBarData} />
+      {/* Right Sidebar (Top Users, Gifts, Missions, Chat) */}
+      <div className="hidden md:block md:w-96 bg-white dark:bg-gray-800 shadow-sm md:flex-col overflow-hidden border-l border-gray-200 dark:border-gray-700">
+        <LobbyRightSidebar topUsers={sideBarData} chatMessages={chatMessages} />
+      </div>
 
       {/* Mobile sidebar */}
       {showMobileSidebar && (
