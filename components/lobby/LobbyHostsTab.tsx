@@ -1,12 +1,13 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import { Gift, Star, Mic, X, User } from "lucide-react";
 import UserProfileModal from "../user/UserProfileModal";
 import BookingRequestForm from "../messages/BookingRequestForm";
 import * as Dialog from "@radix-ui/react-dialog";
 import type { Cohost, LobbyData, LobbyHostsTabProps } from "./lobby.types";
+import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 
 // Helper function to chunk array
 function chunkArray<T>(arr: T[], size: number): T[][] {
@@ -39,6 +40,40 @@ export default function LobbyHostsTab({
     services?: Array<{title: string, price: string, description: string}>;
   } | null>(null);
 
+  // Add state for gift dialog and animation
+  const [showGiftDialog, setShowGiftDialog] = useState(false);
+  const [selectedGift, setSelectedGift] = useState<string | null>(null);
+  const [showGiftAnimation, setShowGiftAnimation] = useState(false);
+  const [dotLottie, setDotLottie] = React.useState<any>(null);
+  const [showGiftFlyToHost, setShowGiftFlyToHost] = useState(false);
+  const [giftFlyStyle, setGiftFlyStyle] = useState<any>({});
+  // Store refs for all avatars (main host and co-hosts)
+  const hostAvatarRefs = useRef<{ [id: string]: HTMLDivElement | null }>({});
+  const [flyGiftImage, setFlyGiftImage] = useState<string | null>(null);
+  const [giftTargetHostId, setGiftTargetHostId] = useState<string | null>(null);
+
+  // Gift data
+  const gifts = [
+    {
+      key: "blooming-strength",
+      name: "Blooming Strength",
+      image: "/images/gifts/blooming-strength.png",
+      animation: "/images/gifts/blooming-strength.lottie",
+    },
+    {
+      key: "soaring-spirit",
+      name: "Soaring Spirit",
+      image: "/images/gifts/soaring-spirit.png",
+      animation: "/images/gifts/soaring-spirit.lottie",
+    },
+    {
+      key: "voice-amplified",
+      name: "Voice Amplified",
+      image: "/images/gifts/voice-amplified.png",
+      animation: "/images/gifts/voice-amplified.lottie",
+    },
+  ];
+
   // Handle booking dialog open
   const handleBookClick = (host: any, isMainHost = false) => {
     setBookingHost({
@@ -61,8 +96,95 @@ export default function LobbyHostsTab({
     setShowBookingForm(false);
   };
 
+  // Handle send gift
+  const handleSendGift = () => {
+    if (selectedGift && giftTargetHostId) {
+      setShowGiftAnimation(true);
+      setShowGiftDialog(false);
+    }
+  };
+
   // Split cohosts into rows of 4
   const cohostRows = chunkArray(lobbyData.cohosts, 4);
+
+  useEffect(() => {
+
+    // This function will be called when the animation starts playing.
+    function onPlay() {
+      console.log('Animation start playing');
+    }
+
+    // This function will be called when the animation is paused.
+    function onPause() {
+      console.log('Animation paused');
+    }
+
+    // This function will be called when the animation is completed.
+    function onComplete() {
+      setShowGiftAnimation(false);
+      // Fly-to-avatar effect for any host/co-host
+      if (selectedGift && giftTargetHostId && hostAvatarRefs.current[giftTargetHostId]) {
+        const avatarNode = hostAvatarRefs.current[giftTargetHostId];
+        const avatarRect = avatarNode!.getBoundingClientRect();
+        const centerX = window.innerWidth / 2;
+        const centerY = window.innerHeight / 2;
+        const avatarX = avatarRect.left + avatarRect.width / 2;
+        const avatarY = avatarRect.top + avatarRect.height / 2;
+        setGiftFlyStyle({
+          position: 'fixed',
+          left: centerX - 32, // 64x64 image
+          top: centerY - 32,
+          width: 64,
+          height: 64,
+          zIndex: 200,
+          transition: 'all 0.8s cubic-bezier(0.4,0,0.2,1)',
+          pointerEvents: 'none',
+        });
+        setFlyGiftImage(gifts.find(g => g.key === selectedGift)?.image || null);
+        setShowGiftFlyToHost(true);
+        setTimeout(() => {
+          setGiftFlyStyle((prev: any) => ({
+            ...prev,
+            left: avatarX - 32,
+            top: avatarY - 32,
+            opacity: 0.7,
+            transform: 'scale(0.7)',
+          }));
+        }, 30);
+        setTimeout(() => {
+          setShowGiftFlyToHost(false);
+          setFlyGiftImage(null);
+        }, 900);
+      }
+      console.log('Animation completed');
+    }
+
+    function onFrameChange({currentFrame}: {currentFrame: any}) {
+      // console.log('Current frame: ', currentFrame);
+    }
+
+    // Listen to events emitted by the DotLottie instance when it is available.
+    if (dotLottie) {
+      dotLottie.addEventListener('play', onPlay);
+      dotLottie.addEventListener('pause', onPause);
+      dotLottie.addEventListener('complete', onComplete);
+      dotLottie.addEventListener('frame', onFrameChange);
+    }
+
+    return () => {
+      // Remove event listeners when the component is unmounted.
+      if (dotLottie) {
+        dotLottie.removeEventListener('play', onPlay);
+        dotLottie.removeEventListener('pause', onPause);
+        dotLottie.removeEventListener('complete', onComplete);
+        dotLottie.removeEventListener('frame', onFrameChange);
+      }
+    };
+  }, [dotLottie]);
+
+  const dotLottieRefCallback = (dotLottie: any) => {
+    setDotLottie(dotLottie);
+  };
 
   return (
     <>
@@ -91,7 +213,7 @@ export default function LobbyHostsTab({
         {/* Left side - Main Host */}
         <div className="md:w-1/2 p-4 pt-2 md:pt-4">
           <div className="flex items-start">
-            <div className="relative mr-3">
+            <div className="relative mr-3" ref={el => { hostAvatarRefs.current['host'] = el; }}>
               {/* Avatar with speaking indicator */}
               <div className={`w-14 h-14 rounded-full overflow-hidden ${speakingUser === lobbyData.hostName ? 'ring-2 ring-blue-500 ring-offset-2 dark:ring-offset-gray-800' : ''}`}>
                 <Image
@@ -138,7 +260,11 @@ export default function LobbyHostsTab({
 
               <div className="flex items-center justify-between">
                 <div className="flex space-x-2">
-                  <button className="bg-blue-500 text-white p-2 rounded-full flex items-center justify-center w-10 h-10 shadow-sm hover:shadow transition-all">
+                  <button
+                    className="bg-blue-500 text-white p-2 rounded-full flex items-center justify-center w-10 h-10 shadow-sm hover:shadow transition-all"
+                    onClick={() => { setShowGiftDialog(true); setGiftTargetHostId('host'); }}
+                    aria-label="Send Gift"
+                  >
                     <Gift size={18} className="cursor-pointer" />
                   </button>
                   <button 
@@ -165,7 +291,7 @@ export default function LobbyHostsTab({
                   <div
                     key={host.id}
                     className="relative"
-                    ref={(el) => { coHostRefs.current[host.id] = el; }}
+                    ref={el => { hostAvatarRefs.current[host.id] = el; coHostRefs.current[host.id] = el; }}
                     onClick={() => handleCoHostClick(host.id)}
                   >
                     {/* Avatar - make it clickable */}
@@ -207,7 +333,16 @@ export default function LobbyHostsTab({
                         </div>
                         <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">{host.specialty}</p>
                         <div className="flex justify-center gap-1 mt-1">
-                          <button className={`${host.online ? 'bg-blue-500 text-white' : 'bg-gray-200 dark:bg-gray-600 text-gray-500 dark:text-gray-400'} p-1 rounded-full`}>
+                          <button 
+                            className={`${host.online ? 'bg-blue-500 text-white' : 'bg-gray-200 dark:bg-gray-600 text-gray-500 dark:text-gray-400'} p-1 rounded-full`}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              if (host.online) {
+                                setShowGiftDialog(true);
+                                setGiftTargetHostId(host.id);
+                              }
+                            }}
+                          >
                             <Gift size={12} className="cursor-pointer" />
                           </button>
                           <button 
@@ -288,6 +423,55 @@ export default function LobbyHostsTab({
           </Dialog.Portal>
         )}
       </Dialog.Root>
+
+      {/* Gift Dialog for Jane Smith (now for any host) */}
+      <Dialog.Root open={showGiftDialog} onOpenChange={setShowGiftDialog}>
+        <Dialog.Portal>
+          <Dialog.Overlay className="fixed inset-0 bg-black/40 z-50" />
+          <Dialog.Content className="fixed top-1/2 left-1/2 w-[90vw] max-w-[350px] bg-white dark:bg-gray-800 rounded-lg shadow-lg z-50 p-6 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center">
+            <Dialog.Title className="text-lg font-bold mb-4 text-blue-500">Send a Gift</Dialog.Title>
+            <div className="flex gap-4 mb-6">
+              {gifts.map(gift => (
+                <button
+                  key={gift.key}
+                  className={`flex flex-col items-center border-2 rounded-lg p-2 transition-all focus:outline-none ${selectedGift === gift.key ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/30' : 'border-gray-200 dark:border-gray-700 hover:border-blue-300'}`}
+                  onClick={() => setSelectedGift(gift.key)}
+                >
+                  <img src={gift.image} alt={gift.name} className="w-14 h-14 object-contain mb-1" />
+                  <span className="text-xs font-medium text-gray-700 dark:text-gray-200">{gift.name}</span>
+                </button>
+              ))}
+            </div>
+            <button
+              onClick={handleSendGift}
+              disabled={!selectedGift}
+              className={`w-full py-2 rounded-md text-sm font-medium flex items-center justify-center gap-2 transition-colors ${selectedGift ? 'bg-blue-500 hover:bg-blue-600 text-white' : 'bg-gray-200 text-gray-500 dark:bg-gray-700 dark:text-gray-400 cursor-not-allowed'}`}
+            >
+              Send Gift
+            </button>
+          </Dialog.Content>
+        </Dialog.Portal>
+      </Dialog.Root>
+
+      {/* Gift Animation Overlay (Lottie, transparent, auto-dismiss) */}
+      {showGiftAnimation && selectedGift && (
+        <div className="fixed inset-0 flex items-center justify-center z-[100] bg-transparent">
+          <DotLottieReact
+            src={gifts.find(g => g.key === selectedGift)?.animation || ""}
+            loop={false}
+            autoplay={true}
+            dotLottieRefCallback={dotLottieRefCallback}
+          />
+        </div>
+      )}
+      {/* Fly-to-avatar animation */}
+      {showGiftFlyToHost && flyGiftImage && (
+        <img
+          src={flyGiftImage}
+          alt="Gift fly to host"
+          style={giftFlyStyle}
+        />
+      )}
     </>
   );
 }
