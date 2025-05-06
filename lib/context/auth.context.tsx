@@ -22,6 +22,7 @@ import {
   signOut as serverSignOut,
 } from "@/app/actions/auth.action";
 import { AuthContextType } from "@/types/auth";
+import { useLogin, usePrivy } from "@privy-io/react-auth";
 
 const AuthContext = createContext<AuthContextType>({
   user: null,
@@ -38,6 +39,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [loading, setLoading] = useState(true);
   const [isAnonymous, setIsAnonymous] = useState(false);
   const [googleSignInProgress, setGoogleSignInProgress] = useState(false);
+  const { logout: privyLogout, authenticated: privyAuthenticated } = usePrivy();
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -138,14 +140,19 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       // Add a small delay to allow components to handle the event
       await new Promise((resolve) => setTimeout(resolve, 500));
 
-      // Perform the actual sign out
+      // If authenticated with Privy, log out from Privy as well
+      if (privyAuthenticated && typeof privyLogout === "function") {
+        await privyLogout();
+      }
+
+      // Perform the actual sign out (Firebase and server)
       console.log("Signing out user");
       await firebaseSignOut(auth);
       await serverSignOut();
     } catch (error) {
       console.error("Error signing out:", error);
     }
-  }, []);
+  }, [privyAuthenticated, privyLogout]);
 
   const authContextValue = useMemo(
     () => ({

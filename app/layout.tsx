@@ -11,6 +11,7 @@ import { AgoraCoreProvider } from "@/lib/context/agora-core.context";
 import { AgoraBotsProvider } from "@/lib/context/agora-bots.context";
 import { SidebarProvider } from "@/lib/context/sidebar.context";
 import { ThemeProvider } from "next-themes";
+import { Providers } from "./providers";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -28,41 +29,37 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
-        <ThemeProvider
+      <ThemeProvider
           attribute="class"
           defaultTheme="light"
           disableTransitionOnChange
         >
-          <ConsoleOverride />
-          <AuthProvider>
-            <SidebarProvider>
-              <AuthLoadingWrapper>
-                <AgoraClientProvider>
-                  <AgoraCoreProvider>
-                    <AgoraBotsProvider>
-                      <div className="flex flex-col min-h-screen bg-gray-100 dark:bg-gray-900">
-                        {/* Top Menu Bar */}
-                        <TopMenuBar />
-
-                        {/* Add overflow-hidden here */}
-                        <div className="flex flex-1 overflow-hidden pt-16">
-                          {/* Sidebar with live lobbies */}
-                          {/* <SideBar /> */}
-                          <SideBar />
-
-                          {/* Main content */}
-                          <main className="relative flex-1 flex flex-col overflow-y-auto ml-0 md:ml-64">
-                            {children}
-                          </main>
+          <Providers>
+            <ConsoleOverride />
+            <AuthProvider>
+              <SidebarProvider>
+                <AuthLoadingWrapper>
+                  <AgoraClientProvider>
+                    <AgoraCoreProvider>
+                      <AgoraBotsProvider>
+                        <div className="flex flex-col min-h-screen bg-gray-100 dark:bg-gray-900">
+                          <TopMenuBar />
+                          <div className="flex flex-1 overflow-hidden pt-16">
+                            <SideBar />
+                            <main className="relative flex-1 flex flex-col overflow-y-auto ml-0 md:ml-64">
+                              {children}
+                            </main>
+                          </div>
                         </div>
-                      </div>
-                    </AgoraBotsProvider>
-                  </AgoraCoreProvider>
-                </AgoraClientProvider>
-              </AuthLoadingWrapper>
-            </SidebarProvider>
-          </AuthProvider>
+                      </AgoraBotsProvider>
+                    </AgoraCoreProvider>
+                  </AgoraClientProvider>
+                </AuthLoadingWrapper>
+              </SidebarProvider>
+            </AuthProvider>
+          </Providers>
         </ThemeProvider>
+
       </body>
     </html>
   );

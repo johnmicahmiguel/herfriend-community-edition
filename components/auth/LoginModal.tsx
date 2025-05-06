@@ -5,6 +5,10 @@ import { useState, useEffect } from "react";
 import { useAuth } from "@/lib/context/auth.context";
 import { X } from "lucide-react";
 import { LoginModalProps } from "@/types/auth";
+import { useLogin, usePrivy } from "@privy-io/react-auth";
+import { signInWithCustomToken } from "firebase/auth";
+import { auth } from "@/lib/firebase/config";
+import LoadingScreen from "@/components/ui/LoadingScreen";
 
 export function LoginModal({
   open: externalOpen,
@@ -12,6 +16,10 @@ export function LoginModal({
 }: LoginModalProps = {}) {
   const [internalOpen, setInternalOpen] = useState(false);
   const { user, isAnonymous, signInWithGoogle } = useAuth();
+  const { login } = useLogin();
+  const { ready, authenticated, user: privyUser } = usePrivy();
+  const [walletLoginLoading, setWalletLoginLoading] = useState(false);
+  const [pendingWalletLogin, setPendingWalletLogin] = useState(false);
 
   // Determine if the modal should be open based on props or internal state
   const isOpen = externalOpen !== undefined ? externalOpen : internalOpen;
@@ -40,6 +48,52 @@ export function LoginModal({
     }
   }, [user, isAnonymous]);
 
+  // Handler for wallet login
+  const handleWalletLogin = async () => {
+    setWalletLoginLoading(true);
+    setPendingWalletLogin(true);
+    try {
+      await login({ loginMethods: ["wallet"], walletChainType: "ethereum-only" });
+      // Wait for authenticated and privyUser update in useEffect below.
+    } catch (error) {
+      setWalletLoginLoading(false);
+      setPendingWalletLogin(false);
+    }
+  };
+
+  useEffect(() => {
+    const doWalletFirebaseLogin = async () => {
+      if (
+        pendingWalletLogin &&
+        authenticated &&
+        privyUser?.wallet?.address
+      ) {
+        setWalletLoginLoading(true);
+        try {
+          const walletAddress = privyUser.wallet.address;
+          const res = await fetch("/api/auth/wallet-login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ walletAddress }),
+          });
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.error || "Failed to get custom token");
+          await signInWithCustomToken(auth, data.token);
+        } catch (error) {
+          // Optionally show error
+        } finally {
+          setWalletLoginLoading(false);
+          setPendingWalletLogin(false);
+        }
+      }
+    };
+    doWalletFirebaseLogin();
+  }, [privyUser?.wallet?.address, authenticated, pendingWalletLogin]);
+
+  if (walletLoginLoading) {
+    return <LoadingScreen />;
+  }
+
   return (
     <Dialog.Root open={isOpen} onOpenChange={handleOpenChange}>
       <Dialog.Portal>
@@ -57,8 +111,7 @@ export function LoginModal({
           <div className="flex flex-col gap-3">
             <button
               onClick={signInWithGoogle}
-              className="flex items-center justify-center gap-2 rounded border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-100
-                        dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:hover:bg-gray-700"
+              className="flex items-center justify-center gap-2 rounded border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-100 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:hover:bg-gray-700"
             >
               <img
                 src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
@@ -68,6 +121,13 @@ export function LoginModal({
               Sign in with Google
             </button>
 
+            <button
+              onClick={handleWalletLogin}
+              className="flex items-center justify-center gap-2 rounded border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-100 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:hover:bg-gray-700"
+              disabled={!ready || (ready && authenticated) || walletLoginLoading}
+            >
+              {walletLoginLoading ? "Connecting..." : "Sign in with Wallet"}
+            </button>
 
             <button
               onClick={handleContinueAsGuest}
