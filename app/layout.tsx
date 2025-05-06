@@ -15,7 +15,7 @@ import { ThemeProvider } from "next-themes";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Social Lobby App",
+  title: "HerFriend",
   description:
     "Join lobbies, listen to hosts, chat with users and book hosts for private room"
 };

@@ -2,9 +2,10 @@
 
 import React from "react";
 import * as Tabs from "@radix-ui/react-tabs";
-import { Star } from "lucide-react";
+import { Star, Video, Lock } from "lucide-react";
 import LobbyHostsTab from "./LobbyHostsTab";
 import LobbyAboutTab from "./LobbyAboutTab";
+import LobbyPastVideosTab from "./LobbyPastVideosTab";
 import type { Cohost, LobbyData, LobbyTabsProps } from "./lobby.types";
 
 export default function LobbyTabs({
@@ -29,7 +30,7 @@ export default function LobbyTabs({
   setProfileUserId,
   hideHostsTab = false,
   defaultTab = "hosts",
-}: LobbyTabsProps & { hideHostsTab?: boolean; defaultTab?: "hosts" | "about" }) {
+}: LobbyTabsProps & { hideHostsTab?: boolean; defaultTab?: "hosts" | "about" | "past-videos" }) {
   // If the activeTab is not in the available tabs, set it to defaultTab
   React.useEffect(() => {
     if (hideHostsTab && activeTab === "hosts") {
@@ -48,7 +49,7 @@ export default function LobbyTabs({
           {!hideHostsTab && (
             <Tabs.Trigger
               value="hosts"
-              className={`flex-1 py-2 md:py-3 text-sm md:text-base font-medium ${activeTab === "hosts" ? "text-blue-500 border-b-2 border-blue-500 relative -mb-[2px]" : "text-gray-600 dark:text-gray-300"}`}
+              className={`flex-auto min-w-0 py-2 md:py-3 text-sm md:text-base font-medium ${activeTab === "hosts" ? "text-blue-500 border-b-2 border-blue-500 relative -mb-[2px]" : "text-gray-600 dark:text-gray-300"}`}
             >
               <Star size={16} className="inline mr-1 md:mr-2" />
               Hosts
@@ -56,9 +57,16 @@ export default function LobbyTabs({
           )}
           <Tabs.Trigger
             value="about"
-            className={`flex-1 py-2 md:py-3 text-sm md:text-base font-medium ${activeTab === "about" ? "text-blue-500 border-b-2 border-blue-500 relative -mb-[2px]" : "text-gray-600 dark:text-gray-300"}`}
+            className={`flex-auto min-w-0 py-2 md:py-3 text-sm md:text-base font-medium ${activeTab === "about" ? "text-blue-500 border-b-2 border-blue-500 relative -mb-[2px]" : "text-gray-600 dark:text-gray-300"}`}
           >
             About
+          </Tabs.Trigger>
+          <Tabs.Trigger
+            value="past-videos"
+            className={`flex-auto min-w-0 py-2 md:py-3 text-sm md:text-base font-medium flex items-center justify-center gap-1 ${activeTab === "past-videos" ? "text-blue-500 border-b-2 border-blue-500 relative -mb-[2px]" : "text-gray-600 dark:text-gray-300"}`}
+          >
+            <Lock size={16} className="text-yellow-400" />
+            <span>Past Videos</span>
           </Tabs.Trigger>
         </Tabs.List>
         {/* Tabs content */}
@@ -91,6 +99,9 @@ export default function LobbyTabs({
               description={lobbyData.description ?? ""}
               schedule={lobbyData.schedule ?? ""}
             />
+          </Tabs.Content>
+          <Tabs.Content value="past-videos" className="flex-1 flex flex-col bg-blue-50 dark:bg-gray-800 p-3 md:p-4 overflow-auto">
+            <LobbyPastVideosTab />
           </Tabs.Content>
         </div>
       </Tabs.Root>

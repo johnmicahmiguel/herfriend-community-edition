@@ -109,7 +109,10 @@ const mockUserLevel: UserLevel = {
 
 export default function LobbyPage() {
   const { user, loading, isAnonymous } = useAuth();
-  const [activeTab, setActiveTab] = useState("hosts");
+  const params = useParams();
+  const lobbyId = params?.id as string;
+  // Initialize activeTab based on lobby type
+  const [activeTab, setActiveTab] = useState(lobbyId === "VOICE_LOBBY" ? "about" : "hosts");
   const [speakingUser, setSpeakingUser] = useState("Jane Smith");
   const [showMobileSidebar, setShowMobileSidebar] = useState(false);
   const [coHostsMinimized, setCoHostsMinimized] = useState(false);
@@ -126,9 +129,6 @@ export default function LobbyPage() {
   const coHostRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
   const goalTooltipContainerRef = useRef<HTMLDivElement | null>(null);
   const pinnedTooltipContainerRef = useRef<HTMLDivElement | null>(null);
-
-  const params = useParams();
-  const lobbyId = params?.id as string;
 
   // Dummy data for demonstration
   const lobbyData = {
@@ -387,9 +387,9 @@ export default function LobbyPage() {
   // VOICE LOBBY UI
   if (lobbyId === "VOICE_LOBBY") {
     return (
-      <div className="h-[calc(100vh-80px)] md:h-[calc(100vh-64px)] flex flex-col md:flex-row overflow-hidden bg-gray-50 dark:bg-gray-900 relative">
+      <div className="flex flex-col md:flex-row overflow-hidden bg-gray-50 dark:bg-gray-900 relative">
         {/* Main content area */}
-        <div className="flex-1 flex flex-col overflow-hidden">
+        <div className="flex-1 flex flex-col overflow-hidden md:mr-96">
           {/* Voice Lobby Content */}
           <LobbyVoiceContent
             host={{
@@ -398,7 +398,7 @@ export default function LobbyPage() {
             }}
             cohosts={lobbyData.cohosts}
           />
-          {/* Tabs (Hosts, About) */}
+          {/* Tabs (About, Past Videos) */}
           <div className="flex-1 flex flex-col overflow-hidden relative">
             <LobbyTabs
               activeTab={activeTab}
@@ -421,11 +421,12 @@ export default function LobbyPage() {
               profileUserId={profileUserId}
               setProfileUserId={setProfileUserId}
               hideHostsTab={true}
+              defaultTab="about"
             />
           </div>
         </div>
         {/* Right Sidebar (Top Users, Gifts, Missions, Chat) */}
-        <div className="hidden md:block md:w-96 bg-white dark:bg-gray-800 shadow-sm md:flex-col overflow-hidden border-l border-gray-200 dark:border-gray-700">
+        <div className="hidden md:block fixed top-16 right-0 h-[calc(100vh-64px)] w-96 bg-white dark:bg-gray-800 shadow-sm flex-col overflow-hidden border-l border-gray-200 dark:border-gray-700 z-30">
           <LobbyRightSidebar topUsers={sideBarData} chatMessages={chatMessages} />
         </div>
         {/* Mobile sidebar */}
@@ -470,9 +471,9 @@ export default function LobbyPage() {
   }
 
   return (
-    <div className="h-[calc(100vh-80px)] md:h-[calc(100vh-64px)] flex flex-col md:flex-row overflow-hidden bg-gray-50 dark:bg-gray-900 relative">
+    <div className="flex flex-col md:flex-row overflow-hidden bg-gray-50 dark:bg-gray-900 relative">
       {/* Main content area */}
-      <div className="flex-1 flex flex-col overflow-hidden">
+      <div className="flex-1 flex flex-col overflow-hidden md:mr-96">
         {/* Video Player */}
         <div
           className="relative"
@@ -521,7 +522,7 @@ export default function LobbyPage() {
       </div>
 
       {/* Right Sidebar (Top Users, Gifts, Missions, Chat) */}
-      <div className="hidden md:block md:w-96 bg-white dark:bg-gray-800 shadow-sm md:flex-col overflow-hidden border-l border-gray-200 dark:border-gray-700">
+      <div className="hidden md:block md:w-96 bg-white dark:bg-gray-800 shadow-sm md:flex-col overflow-hidden border-l border-gray-200 dark:border-gray-700 fixed top-16 right-0 h-[calc(100vh-64px)]">
         <LobbyRightSidebar topUsers={sideBarData} chatMessages={chatMessages} />
       </div>
 

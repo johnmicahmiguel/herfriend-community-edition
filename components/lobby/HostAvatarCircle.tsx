@@ -7,6 +7,7 @@ interface HostAvatarCircleProps {
   online?: boolean;
   size?: "lg" | "md" | "sm";
   speaking?: boolean;
+  borderColor?: string;
 }
 
 const sizeMap = {
@@ -22,18 +23,21 @@ export default function HostAvatarCircle({
   online = false,
   size = "md",
   speaking = false,
+  borderColor,
 }: HostAvatarCircleProps) {
   // Border and grayscale logic for cohosts
-  let borderClass = "";
+  let borderClass = borderColor || "";
   let grayscaleClass = "";
-  if (role === "Host") {
-    borderClass = "border-amber-400";
-  } else {
-    if (online) {
-      borderClass = "border-blue-500";
+  if (!borderColor) {
+    if (role === "Host") {
+      borderClass = "border-amber-400";
     } else {
-      borderClass = "border-gray-300 dark:border-gray-600";
-      grayscaleClass = "grayscale opacity-75";
+      if (online) {
+        borderClass = "border-blue-500";
+      } else {
+        borderClass = "border-gray-300 dark:border-gray-600";
+        grayscaleClass = "grayscale opacity-75";
+      }
     }
   }
   // Speaking ring logic

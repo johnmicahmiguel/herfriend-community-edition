@@ -95,8 +95,8 @@ export default function LobbyHostsTab({
               {/* Avatar with speaking indicator */}
               <div className={`w-14 h-14 rounded-full overflow-hidden ${speakingUser === lobbyData.hostName ? 'ring-2 ring-blue-500 ring-offset-2 dark:ring-offset-gray-800' : ''}`}>
                 <Image
-                  src={lobbyData.hostAvatar}
-                  alt={lobbyData.hostName}
+                  src={"https://randomuser.me/api/portraits/women/44.jpg"}
+                  alt={"Jane Smith"}
                   width={64}
                   height={64}
                   className="object-cover"
@@ -119,7 +119,7 @@ export default function LobbyHostsTab({
 
             <div className="flex-1">
               <div className="flex items-center">
-                <h4 className="text-base font-medium dark:text-gray-100">{lobbyData.hostName}</h4>
+                <h4 className="text-base font-medium dark:text-gray-100">Jane Smith</h4>
                 {/* Online indicator */}
                 <span className="ml-2 inline-block w-2 h-2 bg-green-500 rounded-full"></span>
                 <button 
@@ -132,7 +132,9 @@ export default function LobbyHostsTab({
                   <User size={16} className="cursor-pointer" />
                 </button>
               </div>
-              <p className="text-sm text-gray-600 dark:text-gray-300 mb-2">{lobbyData.hostBio}</p>
+              <p className="text-sm text-gray-600 dark:text-gray-300 mb-2">
+                Hi! I'm Jane Smith, a passionate explorer and creator of social experiments with nature. My mission is to connect people with the outdoors, foster curiosity, and inspire positive change through immersive, interactive experiences. Join me as we discover the wonders of the natural world together!
+              </p>
 
               <div className="flex items-center justify-between">
                 <div className="flex space-x-2">
