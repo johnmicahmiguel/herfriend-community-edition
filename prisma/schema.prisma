@@ -29,6 +29,7 @@ model User {
   fcmToken         String?
   usernameHistory  Json[]    @default([])
   deviceDetailsList Json[]    @default([])
+  walletAddress    String?
 
   @@map("users")
 }
