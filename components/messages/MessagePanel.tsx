@@ -8,38 +8,17 @@ import MessageView from "./MessageView";
 import MessageSearch from "./MessageSearch";
 import { LoginModal } from "../auth/LoginModal";
 import { MessageThreadWithDates } from "@/types/messages";
-
-// Placeholder data
-const placeholderThreads: MessageThreadWithDates[] = [
-  {
-    threadId: "thread1",
-    otherUserUid: "user2",
-    otherUserName: "Alice",
-    otherUserPhoto: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-    lastMessage: "Hey, how are you?",
-    lastTimestamp: new Date(Date.now() - 3600000), // 1 hour ago
-    updatedAt: new Date(Date.now() - 3600000),
-    unreadCount: 2,
-  },
-  {
-    threadId: "thread2",
-    otherUserUid: "user3",
-    otherUserName: "Bob",
-    otherUserPhoto: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-    lastMessage: "See you tomorrow!",
-    lastTimestamp: new Date(Date.now() - 86400000), // 1 day ago
-    updatedAt: new Date(Date.now() - 86400000),
-    unreadCount: 0,
-  },
-];
-
-const placeholderSelectedThread: MessageThreadWithDates = placeholderThreads[0];
+import { useAuth } from "@/lib/context/auth.context";
+import { database } from "@/lib/firebase/config";
+import { ref, onValue, off } from "firebase/database";
 
 const MessagePanel: React.FC<MessagePanelProps> = ({ open, onClose }) => {
   const [selectedThread, setSelectedThread] =
     useState<MessageThreadWithDates | null>(null);
   const [showSearch, setShowSearch] = useState(false);
   const panelRef = useRef<HTMLDivElement>(null);
+  const { user, isAnonymous, loading } = useAuth();
+  const [threads, setThreads] = useState<MessageThreadWithDates[]>([]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -68,6 +47,27 @@ const MessagePanel: React.FC<MessagePanelProps> = ({ open, onClose }) => {
       document.removeEventListener('keydown', handleEscapeKey);
     };
   }, [open, onClose]);
+
+  useEffect(() => {
+    if (!user?.uid) return;
+    const threadsRef = ref(database, `messages/by-user/${user.uid}/threads`);
+    const handleValue = (snapshot: any) => {
+      const data = snapshot.val() || {};
+      const threadList: MessageThreadWithDates[] = Object.entries(data).map(([threadId, t]: any) => ({
+        threadId,
+        otherUserUid: t.otherUserUid,
+        otherUserName: t.otherUserUsername,
+        otherUserPhoto: t.otherUserPhoto,
+        lastMessage: t.lastMessage,
+        lastTimestamp: t.lastTimestamp ? new Date(t.lastTimestamp) : new Date(),
+        updatedAt: t.updatedAt ? new Date(t.updatedAt) : new Date(),
+        unreadCount: t.unreadCount || 0,
+      }));
+      setThreads(threadList.sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime()));
+    };
+    onValue(threadsRef, handleValue);
+    return () => off(threadsRef, "value", handleValue);
+  }, [user?.uid]);
 
   const handleSelectThread = (thread: MessageThreadWithDates) => {
     console.log("Selected thread:", thread.threadId);
@@ -98,12 +98,6 @@ const MessagePanel: React.FC<MessagePanelProps> = ({ open, onClose }) => {
     };
     setSelectedThread(newThread);
     setShowSearch(false);
-  };
-
-  const mockUser = {
-    uid: "user1",
-    displayName: "Current User",
-    photoURL: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
   };
 
   return (
@@ -171,16 +165,16 @@ const MessagePanel: React.FC<MessagePanelProps> = ({ open, onClose }) => {
             ) : selectedThread ? (
               <MessageView
                 selectedThread={selectedThread}
-                currentUserId={mockUser.uid}
-                currentUserName={mockUser.displayName || "User"}
-                currentUserPhoto={mockUser.photoURL || ""}
+                currentUserId={user?.uid || ""}
+                currentUserName={user?.displayName || user?.email || "User"}
+                currentUserPhoto={user?.photoURL || ""}
                 onSendMessage={handleSendMessage}
                 onBack={() => setSelectedThread(null)}
               />
             ) : (
               <ThreadList
-                threads={placeholderThreads}
-                selectedThreadId={null}
+                threads={threads}
+                selectedThreadId={selectedThread ? selectedThread : null}
                 onSelectThread={handleSelectThread}
               />
             )}

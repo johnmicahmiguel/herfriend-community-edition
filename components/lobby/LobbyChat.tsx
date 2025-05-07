@@ -5,7 +5,12 @@ import Image from "next/image";
 import * as ScrollArea from "@radix-ui/react-scroll-area";
 import { ChevronRight, User } from "lucide-react";
 import UserProfileModal from "../user/UserProfileModal";
-import type { ChatMessage, LobbyChatProps } from "./lobby.types";
+import type { ChatMessage } from "./lobby.types";
+import { database } from "@/lib/firebase/config";
+import { ref, onValue, off, query, orderByKey, limitToLast } from "firebase/database";
+import { useAuth } from "@/lib/context/auth.context";
+import { sendLobbyChatMessage } from "@/app/actions/chat.action";
+import { LoginModal } from "@/components/auth/LoginModal";
 
 // Helper function to get badge styling based on text and level
 const getBadgeStyle = (badgeText: string, level: number): string => {
@@ -47,12 +52,38 @@ const getBadgeStyle = (badgeText: string, level: number): string => {
   return baseClasses + colorClasses;
 };
 
-export default function LobbyChat({ chatMessages }: LobbyChatProps) {
+export default function LobbyChat({ lobbyId }: { lobbyId: string }) {
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [visiblePopoverId, setVisiblePopoverId] = useState<string | null>(null);
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [profileUserId, setProfileUserId] = useState<string | null>(null);
   const popoverRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
+  const [input, setInput] = useState("");
+  const [sending, setSending] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const { user, loading, isAnonymous } = useAuth();
+  const [loginModalOpen, setLoginModalOpen] = useState(false);
+
+  useEffect(() => {
+    if (!lobbyId) return;
+    const messagesRef = query(ref(database, `lobbies/${lobbyId}/messages`), orderByKey(), limitToLast(50));
+    const handleValue = (snapshot: any) => {
+      const data = snapshot.val() || {};
+      const messages: ChatMessage[] = Object.entries(data).map(([id, msg]: any) => ({
+        id,
+        user: msg.from?.username || "Anonymous",
+        message: msg.body || "",
+        avatar: msg.from?.profilePic || "",
+        time: msg.timestamp ? new Date(msg.timestamp).toLocaleTimeString() : "",
+        level: msg.from?.level,
+        badge: msg.from?.badge,
+      })).sort((a, b) => a.time.localeCompare(b.time));
+      setChatMessages(messages);
+    };
+    onValue(messagesRef, handleValue);
+    return () => off(messagesRef, "value", handleValue);
+  }, [lobbyId]);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -76,6 +107,30 @@ export default function LobbyChat({ chatMessages }: LobbyChatProps) {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [visiblePopoverId]);
+
+  const handleSend = async () => {
+    if (!input.trim() || !user) return;
+    setSending(true);
+    setError(null);
+    const message = input.trim();
+    setInput("");
+    try {
+      const res = await sendLobbyChatMessage({
+        lobbyId,
+        message,
+        user: {
+          uid: user.uid,
+          displayName: user.displayName || user.email || "Anonymous",
+          photoURL: user.photoURL || null,
+        },
+      });
+      if (!res.success) setError(res.error || "Failed to send message");
+    } catch (e: any) {
+      setError(e.message || "Failed to send message");
+    } finally {
+      setSending(false);
+    }
+  };
 
   return (
     <div className="bg-white dark:bg-gray-800 flex flex-col flex-grow overflow-hidden border-t border-blue-100 dark:border-gray-700">
@@ -171,17 +226,40 @@ export default function LobbyChat({ chatMessages }: LobbyChatProps) {
       {/* Chat input */}
       <div className="p-2 md:p-3 border-t border-blue-100 dark:border-gray-700 flex-shrink-0 bg-white dark:bg-gray-800">
         <div className="flex items-center">
-          <input 
-            type="text" 
-            placeholder="Type a message..." 
-            className="flex-1 text-xs md:text-sm border border-blue-200 dark:border-gray-600 rounded-full px-3 py-1.5 md:px-4 md:py-2 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 bg-white dark:bg-gray-700 dark:text-gray-200 dark:placeholder-gray-400"
-          />
-          <button className="bg-blue-500 text-white p-1.5 md:p-2 rounded-full ml-2 shadow-sm hover:shadow transition-all cursor-pointer">
+          {(!user || isAnonymous) ? (
+            <div className="flex-1">
+              <button
+                className="text-blue-500 hover:underline text-xs md:text-sm px-3 py-1.5 md:px-4 md:py-2 w-full text-left bg-transparent"
+                onClick={() => setLoginModalOpen(true)}
+              >
+                Sign in to chat
+              </button>
+            </div>
+          ) : (
+            <input
+              type="text"
+              placeholder="Type a message..."
+              className="flex-1 text-xs md:text-sm border border-blue-200 dark:border-gray-600 rounded-full px-3 py-1.5 md:px-4 md:py-2 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 bg-white dark:bg-gray-700 dark:text-gray-200 dark:placeholder-gray-400"
+              value={input}
+              onChange={e => setInput(e.target.value)}
+              onKeyDown={e => { if (e.key === 'Enter') handleSend(); }}
+              disabled={!user || isAnonymous}
+            />
+          )}
+          <button
+            className="bg-blue-500 text-white p-1.5 md:p-2 rounded-full ml-2 shadow-sm hover:shadow transition-all cursor-pointer"
+            onClick={handleSend}
+            disabled={sending || !user || !input.trim() || isAnonymous}
+          >
             <ChevronRight size={16} className="md:hidden" />
             <ChevronRight size={18} className="hidden md:block" />
           </button>
         </div>
+        {error && (
+          <p className="text-xs text-red-500 mt-2">{error}</p>
+        )}
       </div>
+      <LoginModal open={loginModalOpen} onOpenChange={setLoginModalOpen} />
       
       {showProfileModal && profileUserId && (
         <UserProfileModal 

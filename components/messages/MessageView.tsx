@@ -8,51 +8,10 @@ import * as ScrollArea from "@radix-ui/react-scroll-area";
 import BookingRequestForm from "./BookingRequestForm";
 import { BookingMessage } from "./BookingMessageTypes";
 import { useRouter } from "next/navigation";
-
-// --- Placeholder Data ---
-const placeholderMessages: MessageWithDate[] = [
-  {
-    id: "m1",
-    content: "Hey Alice! How's it going?",
-    senderId: "user1",
-    senderName: "Current User",
-    timestamp: new Date(Date.now() - 7200000), // 2 hours ago
-    read: true,
-  },
-  {
-    id: "m2",
-    content: "Hi! Pretty good, just working on the project.",
-    senderId: "user2",
-    senderName: "Alice",
-    timestamp: new Date(Date.now() - 7140000), // 1 min later
-    read: true,
-  },
-  {
-    id: "m3",
-    content: "Cool, need any help?",
-    senderId: "user1",
-    senderName: "Current User",
-    timestamp: new Date(Date.now() - 7080000), // 1 min later
-    read: true,
-  },
-  {
-    id: "m4",
-    content: "Maybe later, thanks!",
-    senderId: "user2",
-    senderName: "Alice",
-    timestamp: new Date(Date.now() - 7020000), // 1 min later
-    read: true,
-  },
-  {
-    id: "m5",
-    content: "Okay, let me know.",
-    senderId: "user1",
-    senderName: "Current User",
-    timestamp: new Date(Date.now() - 3600000), // 1 hour ago
-    read: false, // Example of unread
-  },
-];
-// --- End Placeholder Data ---
+import { database } from "@/lib/firebase/config";
+import { ref, onValue, off, query, orderByKey, limitToLast } from "firebase/database";
+import { sendPrivateMessageAction } from "@/app/actions/user.action";
+import { useAuth } from "@/lib/context/auth.context";
 
 // Message input component (Simplified)
 const MessageInput: React.FC<{
@@ -233,7 +192,7 @@ const InlineBookingForm: React.FC<{
   ];
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-blue-100 dark:border-gray-700 p-3 mb-4">
+    <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg shadow-sm border border-blue-100 dark:border-blue-700 p-3 mb-4">
       <div className="flex justify-between items-center mb-3">
         <h3 className="text-sm font-medium text-gray-800 dark:text-gray-200">Book with {hostName}</h3>
         <button onClick={onCancel} className="text-gray-400 hover:text-gray-500">
@@ -357,21 +316,61 @@ const MessageView: React.FC<MessageViewProps> = ({
   onBack,
 }) => {
   const router = useRouter();
-  // Removed state: messages, isLoading
-  // Removed ref: messagesEndRef
-  // Removed function: scrollToBottom
-  // Removed useEffect for fetching messages
-  // Removed function: groupMessagesByDate
+  const { user } = useAuth();
+  const [messages, setMessages] = useState<MessageWithDate[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [sending, setSending] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Messages are now expected to be passed in or derived, using placeholder for now
-  const messages = placeholderMessages;
+  useEffect(() => {
+    if (!selectedThread) return;
+    setLoading(true);
+    const threadId = selectedThread.threadId;
+    const messagesRef = query(ref(database, `messages/content/${threadId}`), orderByKey(), limitToLast(100));
+    const handleValue = (snapshot: any) => {
+      const data = snapshot.val() || {};
+      const msgList: MessageWithDate[] = Object.entries(data).map(([id, m]: any) => ({
+        id,
+        content: m.content,
+        senderId: m.senderId,
+        senderName: m.senderUsername,
+        timestamp: m.timestamp ? new Date(m.timestamp) : new Date(),
+        read: m.read,
+      })).sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime());
+      setMessages(msgList);
+      setLoading(false);
+    };
+    onValue(messagesRef, handleValue);
+    return () => off(messagesRef, "value", handleValue);
+  }, [selectedThread]);
 
-  // Simplified send handler (just calls the prop)
-  const handleSendMessage = (content: string) => {
-    if (!selectedThread) return; // Basic guard
-    console.log("UI: Triggering send message with content:", content);
-    // Call the prop passed down from the parent
-    onSendMessage(content);
+  useEffect(() => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [messages]);
+
+  const handleSendMessage = async (content: string) => {
+    if (!selectedThread || !user) return;
+    setSending(true);
+    setError(null);
+    try {
+      const res = await sendPrivateMessageAction({
+        senderUid: user.uid,
+        receiverUid: selectedThread.otherUserUid,
+        message: content,
+        senderUsername: user.displayName || user.email || "User",
+        senderPhoto: user.photoURL || "",
+        receiverUsername: selectedThread.otherUserName,
+        receiverPhoto: selectedThread.otherUserPhoto,
+      });
+      if (!res.success) setError(res.error || "Failed to send message");
+    } catch (e: any) {
+      setError(e.message || "Failed to send message");
+    } finally {
+      setSending(false);
+    }
   };
 
   // Add booking-related state in the MessageView component
@@ -538,8 +537,7 @@ const MessageView: React.FC<MessageViewProps> = ({
               </div>
             </div>
           </div>
-          
-          {/* Add Book Button */}
+          {/* Book Button restored, toggles booking form */}
           <button
             onClick={() => setShowBookingForm(!showBookingForm)}
             className="flex items-center px-3 py-1.5 bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300 rounded-full text-sm font-medium"
@@ -549,6 +547,17 @@ const MessageView: React.FC<MessageViewProps> = ({
           </button>
         </div>
       </div>
+      {/* Booking Form (restored, only visible when showBookingForm is true) */}
+      {showBookingForm && (
+        <div className="p-3 bg-blue-50 dark:bg-gray-900 border-b border-blue-100 dark:border-gray-800">
+          <InlineBookingForm
+            hostName={selectedThread.otherUserName}
+            hostAvatar={selectedThread.otherUserPhoto}
+            onSubmit={handleBookingRequest}
+            onCancel={() => setShowBookingForm(false)}
+          />
+        </div>
+      )}
 
       {/* Sticky Booking Section - Different for Alice and Bob */}
       <div className="sticky top-0 z-10 bg-blue-50/95 dark:bg-gray-900/95 backdrop-blur-sm border-b border-blue-100 dark:border-gray-800 p-3 space-y-2">
@@ -634,43 +643,30 @@ const MessageView: React.FC<MessageViewProps> = ({
       </div>
 
       {/* Messages Area */}
-      <ScrollArea.Root className="flex-1 overflow-hidden">
-        <ScrollArea.Viewport className="h-full w-full">
-          <div className="px-4 py-3">
-            {/* Inline Booking Form - appears within the message thread */}
-            {showBookingForm && (
-              <InlineBookingForm
-                hostName={selectedThread.otherUserName}
-                hostAvatar={selectedThread.otherUserPhoto}
-                onSubmit={handleBookingRequest}
-                onCancel={() => setShowBookingForm(false)}
-              />
-            )}
-          
-            {/* Add date separators and messages here */}
-            {messageGroups.map((group) => (
-              <div key={group.date.toISOString()}>
-                <DateSeparator date={group.date} />
-                {group.messages.map((message) => (
-                  <MessageBubble
-                    key={message.id}
-                    message={message}
-                    isCurrentUser={message.senderId === currentUserId}
-                  />
-                ))}
-              </div>
-            ))}
+      <div className="flex-1 overflow-y-auto px-3 py-4">
+        {loading ? (
+          <div className="flex justify-center items-center h-full">
+            <span className="text-gray-500 dark:text-gray-400">Loading messages...</span>
           </div>
-        </ScrollArea.Viewport>
-        <ScrollArea.Scrollbar
-          className="flex select-none touch-none p-0.5 bg-gray-100/50 dark:bg-gray-800/50 transition-colors duration-150 ease-out hover:bg-gray-200/50 dark:hover:bg-gray-700/50 data-[orientation=vertical]:w-2 data-[orientation=horizontal]:flex-col data-[orientation=horizontal]:h-2"
-          orientation="vertical"
-        >
-          <ScrollArea.Thumb className="flex-1 bg-gray-300 dark:bg-gray-600 rounded-full relative before:content-[''] before:absolute before:top-1/2 before:left-1/2 before:-translate-x-1/2 before:-translate-y-1/2 before:w-full before:h-full before:min-w-[44px] before:min-h-[44px]" />
-        </ScrollArea.Scrollbar>
-      </ScrollArea.Root>
-
-      {/* Message Input */}
+        ) : (
+          messageGroups.map((group, idx) => (
+            <React.Fragment key={group.date.toISOString()}>
+              <DateSeparator date={group.date} />
+              {group.messages.map((message) => (
+                <MessageBubble
+                  key={message.id}
+                  message={message}
+                  isCurrentUser={message.senderId === currentUserId}
+                />
+              ))}
+            </React.Fragment>
+          ))
+        )}
+        <div ref={messagesEndRef} />
+      </div>
+      {error && (
+        <div className="px-3 pb-2 text-xs text-red-500">{error}</div>
+      )}
       <MessageInput onSendMessage={handleSendMessage} />
     </div>
   );

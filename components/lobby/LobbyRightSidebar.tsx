@@ -6,7 +6,7 @@ import { Users, Award } from "lucide-react";
 
 const SLIDES = ["gifters", "earners"];
 
-export default function LobbyRightSidebar({ topUsers, chatMessages }: { topUsers: any, chatMessages: any }) {
+export default function LobbyRightSidebar({ topUsers, lobbyId }: { topUsers: any, lobbyId: string }) {
   const [showLeaderboard, setShowLeaderboard] = useState(false);
   const [slide, setSlide] = useState(0); // 0: gifters, 1: earners
   const [activeView, setActiveView] = useState<'chat' | 'recent' | 'mission'>('chat');
@@ -120,7 +120,7 @@ export default function LobbyRightSidebar({ topUsers, chatMessages }: { topUsers
       </div>
       {/* Main Content Toggle */}
       <div className="flex-1 flex flex-col min-h-0 bg-blue-50 dark:bg-gray-800">
-        {activeView === 'chat' && <LobbyChat chatMessages={chatMessages} />}
+        {activeView === 'chat' && <LobbyChat lobbyId={lobbyId} />}
         {activeView === 'recent' && (
           <div className="flex-1 overflow-y-auto p-4">
             <h3 className="text-lg font-bold mb-4 text-blue-700 dark:text-gray-100">Recently Joined</h3>
