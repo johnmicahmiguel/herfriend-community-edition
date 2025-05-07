@@ -12,6 +12,7 @@ import { AgoraBotsProvider } from "@/lib/context/agora-bots.context";
 import { SidebarProvider } from "@/lib/context/sidebar.context";
 import { ThemeProvider } from "next-themes";
 import { Providers } from "./providers";
+import SidebarWrapper from "@/components/wrappers/SidebarWrapper";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -45,7 +46,7 @@ export default function RootLayout({
                         <div className="flex flex-col min-h-screen bg-gray-100 dark:bg-gray-900">
                           <TopMenuBar />
                           <div className="flex flex-1 overflow-hidden pt-16">
-                            <SideBar />
+                            <SidebarWrapper />
                             <main className="relative flex-1 flex flex-col overflow-y-auto ml-0 md:ml-64">
                               {children}
                             </main>

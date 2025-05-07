@@ -174,24 +174,6 @@ export default function WalletContent({
     ? invoices.filter(i => i.status === invoiceStatusFilter)
     : invoices;
   
-  const handleTopup = async () => {
-    if (!privyUser?.wallet?.address) return;
-    setTopupLoading(true);
-    setTopupHash(null);
-    const res = await fetch("/api/topup-sepolia", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        to: privyUser.wallet.address,
-        amount: "0.01",
-      }),
-    });
-    const data = await res.json();
-    setTopupLoading(false);
-    if (data.hash) setTopupHash(data.hash);
-    else alert(data.error || "Top-up failed");
-  };
-  
   const handleBuyDiamonds = async () => {
     if (!privyUser?.wallet?.address) return;
     setBuying(true);

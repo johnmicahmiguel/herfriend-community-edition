@@ -4,9 +4,10 @@ import React, { memo, useCallback } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { LobbyCardProps } from "@/types/lobby";
+import { Mic, Video } from "lucide-react";
 
 function LobbyCard({ lobby, preventNavigation = false }: LobbyCardProps) {
-  const { id, title, hostName, thumbnail, viewers, category, isLive } = lobby;
+  const { id, title, description, thumbnail, viewerCount, category, isLive, categories } = lobby;
   const router = useRouter();
 
   const handleCardClick = useCallback(() => {
@@ -27,7 +28,7 @@ function LobbyCard({ lobby, preventNavigation = false }: LobbyCardProps) {
 
   return (
     <div
-      className="bg-white dark:bg-gray-800 rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-300 cursor-pointer"
+      className="bg-white dark:bg-gray-800 rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-300 cursor-pointer h-96 flex flex-col"
       onClick={handleCardClick}
       role="link"
       tabIndex={0}
@@ -45,6 +46,17 @@ function LobbyCard({ lobby, preventNavigation = false }: LobbyCardProps) {
             className="object-cover"
             draggable="false"
           />
+          {/* Lobby type icon (top right) */}
+          {lobby.type === "VOICE_LOBBY" && (
+            <div className="absolute top-3 right-3 bg-blue-100 text-blue-600 p-1.5 rounded-full shadow">
+              <Mic size={18} />
+            </div>
+          )}
+          {lobby.type === "VIDEO_LOBBY" && (
+            <div className="absolute top-3 right-3 bg-green-100 text-green-600 p-1.5 rounded-full shadow">
+              <Video size={18} />
+            </div>
+          )}
         </div>
 
         {isLive && (
@@ -54,7 +66,7 @@ function LobbyCard({ lobby, preventNavigation = false }: LobbyCardProps) {
         )}
 
         <div className="absolute bottom-3 left-3 bg-black bg-opacity-70 text-white text-sm px-3 py-1 rounded-full">
-          {viewers} viewers
+          {viewerCount} viewers
         </div>
       </div>
 
@@ -63,8 +75,16 @@ function LobbyCard({ lobby, preventNavigation = false }: LobbyCardProps) {
         <h3 className="font-semibold text-gray-800 dark:text-gray-100 truncate text-lg">
           {title}
         </h3>
-        <p className="text-base text-gray-600 dark:text-gray-300 mt-2">{hostName}</p>
-        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{category}</p>
+        <p className="text-base text-gray-600 dark:text-gray-300 mt-2">{description}</p>
+        {categories && categories.length > 0 && (
+          <div className="flex flex-wrap gap-2 mt-2">
+            {categories.map((cat: string) => (
+              <span key={cat} className="bg-blue-100 text-blue-800 text-xs font-semibold px-2 py-1 rounded-full dark:bg-blue-900 dark:text-blue-200">
+                {cat}
+              </span>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

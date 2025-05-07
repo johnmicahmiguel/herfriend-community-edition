@@ -11,7 +11,7 @@ function generateProfilePicture(): string {
 }
 
 export async function createOrUpdateUser(user: FirebaseUser) {
-  const { uid, email, displayName } = user;
+  const { uid, email, displayName, photoURL } = user;
 
   if (!email) {
     throw new Error("User email is required");
@@ -22,7 +22,9 @@ export async function createOrUpdateUser(user: FirebaseUser) {
   });
 
   // Only generate a profile picture if the user is new or doesn't have one
-  const profilePic = existingUser?.profilePic || generateProfilePicture();
+  const profilePic = existingUser?.profilePic || photoURL || generateProfilePicture();
+
+  console.log("profilePic", profilePic);
 
   return await prisma.user.upsert({
     where: { uid },
@@ -33,7 +35,7 @@ export async function createOrUpdateUser(user: FirebaseUser) {
       uid,
       email,
       username: displayName || `user_${uid.slice(0, 8)}`,
-      profilePic,
+      profilePic: photoURL || profilePic,
       createdAt: new Date(),
       updatedAt: new Date(),
     },

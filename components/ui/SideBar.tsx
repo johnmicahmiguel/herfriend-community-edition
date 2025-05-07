@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, memo } from "react";
+import React, { useState, memo, useMemo } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Lobby } from "@/types/lobby";
@@ -15,6 +15,8 @@ import {
   LayoutDashboard,
   Trophy,
   Calendar,
+  Mic,
+  Video,
 } from "lucide-react";
 import { useAuth } from "@/lib/context/auth.context";
 import { LoginModal } from "@/components/auth/LoginModal";
@@ -24,40 +26,6 @@ import { onValue, off } from "firebase/database";
 import { useEffect } from "react";
 import { useSidebar } from "@/lib/context/sidebar.context";
 import { usePathname } from "next/navigation";
-
-// Dummy data for lobbies (Copied from LobbyGrid for now)
-const DUMMY_LOBBIES: Lobby[] = [
-    {
-    id: "VIDEO_LOBBY",
-    title: "Social Experience with Nature",
-    hostName: "Nature",
-    thumbnail: "https://images.unsplash.com/photo-1519125323398-675f0ddb6308?q=80&w=1000",
-    viewers: 1245,
-    category: "Education",
-    isLive: true,
-  },
-  {
-    id: "VOICE_LOBBY",
-    title: "Clean Water Initiative",
-    hostName: "WASH Program",
-    thumbnail:
-      "https://images.unsplash.com/photo-1538300342682-cf57afb97285?q=80&w=1000",
-    viewers: 3782,
-    category: "Health",
-    isLive: true,
-  },
-    // ... other dummy lobbies
-    {
-    id: "8",
-    title: "Nutrition for Growth",
-    hostName: "Nutrition Team",
-    thumbnail:
-      "https://images.unsplash.com/photo-1490818387583-1baba5e638af?q=80&w=1000",
-    viewers: 1532,
-    category: "Health",
-    isLive: true,
-  },
-];
 
 // Helper function to format viewer count like Twitch (e.g., 1.2K)
 function formatViewerCount(count: number): string {
@@ -72,29 +40,40 @@ const LobbyItem = memo(
   ({
     lobby,
   }: {
-    lobby: Pick<Lobby, "id" | "hostName" | "thumbnail" | "viewers" | "isLive">;
+    lobby: Pick<Lobby, "id" | "title" | "thumbnail" | "viewerCount" | "isLive" | "type">;
   }) => (
     <Link href={`/lobby/${lobby.id}`} className="block">
       <div className="flex items-center space-x-3 hover:bg-gray-100 p-2 rounded-md transition-colors dark:hover:bg-gray-800">
         <div className="relative w-10 h-10 flex-shrink-0">
           <Image
             src={lobby.thumbnail}
-            alt={lobby.hostName}
+            alt={lobby.title || "Lobby Thumbnail"}
             fill
             sizes="40px"
             className="object-cover rounded"
           />
+          {/* Lobby type icon (top right of avatar) */}
+          {lobby.type === "VOICE_LOBBY" && (
+            <span className="absolute top-0 right-0 bg-blue-100 text-blue-600 p-0.5 rounded-full shadow">
+              <Mic size={13} />
+            </span>
+          )}
+          {lobby.type === "VIDEO_LOBBY" && (
+            <span className="absolute top-0 right-0 bg-green-100 text-green-600 p-0.5 rounded-full shadow">
+              <Video size={13} />
+            </span>
+          )}
         </div>
         <div className="overflow-hidden">
           <p className="font-medium text-sm truncate text-gray-700 dark:text-gray-300">
-            {lobby.hostName}
+            {lobby.title}
           </p>
           <div className="flex items-center mt-0.5">
             {lobby.isLive && (
                 <div className="w-2 h-2 bg-blue-500 rounded-full mr-1.5"></div>
             )}
             <p className="text-xs text-gray-600 dark:text-gray-400">
-              {lobby.isLive ? `${formatViewerCount(lobby.viewers)} viewers` : "Offline"}
+              {lobby.isLive ? `${formatViewerCount(lobby.viewerCount)} viewers` : "Offline"}
             </p>
           </div>
         </div>
@@ -105,7 +84,7 @@ const LobbyItem = memo(
 
 LobbyItem.displayName = "LobbyItem";
 
-export default function SideBar() {
+export default function SideBar({ lobbies = [] }: { lobbies: Lobby[] }) {
   const { user, isAnonymous, loading, signOut } = useAuth();
   const [loginModalOpen, setLoginModalOpen] = useState(false);
   const [messagesPanelOpen, setMessagesPanelOpen] = useState(false);
@@ -148,6 +127,13 @@ export default function SideBar() {
       setMessagesPanelOpen(!messagesPanelOpen);
     }
   };
+
+  // Pick 5 random lobbies for recommended
+  const recommendedLobbies = useMemo(() => {
+    if (lobbies.length <= 5) return lobbies;
+    const shuffled = [...lobbies].sort(() => 0.5 - Math.random());
+    return shuffled.slice(0, 5);
+  }, [lobbies]);
 
   return (
     <>
@@ -298,7 +284,7 @@ export default function SideBar() {
             Recommended Lobbies
           </h3>
           <ul className="space-y-1">
-            {DUMMY_LOBBIES.map((lobby) => (
+            {recommendedLobbies.map((lobby) => (
               <li key={lobby.id}>
                 <LobbyItem lobby={lobby} />
               </li>
