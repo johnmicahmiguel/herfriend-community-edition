@@ -1,4 +1,4 @@
-# Social Lobby App
+# HerFriends
 
 A modern, full-stack social platform where users can join themed lobbies, chat, book hosts, complete missions, and manage their profiles and wallets. Built with Next.js, React, Prisma, Firebase, and TailwindCSS.
 

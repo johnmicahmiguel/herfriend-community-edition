@@ -28,12 +28,12 @@ const LobbyVideoOverlay: React.FC<LobbyVideoOverlayProps> = ({
     <>
       {/* Host Info Overlay (top-left) */}
       <div className="absolute top-3 left-3 flex items-start gap-3 z-10">
-        <img src={hostAvatar} alt={hostName} className="w-10 h-10 rounded-full border-2 border-white shadow object-cover" />
+        <img src={hostAvatar || '/images/default-avatar.jpg'} alt={hostName || 'Default Avatar'} className="w-10 h-10 rounded-full border-2 border-white shadow object-cover" />
         <div className="flex flex-col gap-1">
-          <span className="text-base md:text-lg font-semibold text-white drop-shadow">{hostName}</span>
+          <span className="text-base md:text-lg font-semibold text-white drop-shadow">{hostName || 'Default Name'}</span>
           <span className="text-sm md:text-base font-medium text-white drop-shadow max-w-[320px] truncate">{title}</span>
           <span className="text-xs md:text-sm text-gray-200 mt-0.5 flex items-center gap-1">
-            Playing <span className="font-semibold text-white">{category}</span> for {viewers.toLocaleString()} viewers
+            Playing <span className="font-semibold text-white">{category || 'Default Category'}</span> for {viewers.toLocaleString()} viewers
           </span>
         </div>
       </div>

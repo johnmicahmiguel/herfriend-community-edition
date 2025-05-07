@@ -15,11 +15,13 @@ export async function createServerSession(token: string) {
 
     // Create or update user in the database ONLY for non-anonymous users
     if (!isAnonymous && decodedToken.email) {
+      console.log(decodedToken)
       await createOrUpdateUser({
         uid: decodedToken.uid,
         email: decodedToken.email,
         displayName: decodedToken.name || null,
         emailVerified: decodedToken.email_verified || false,
+        photoURL: decodedToken.picture || null,
         isAnonymous: false,
         getIdToken: async () => token,
       } as any);

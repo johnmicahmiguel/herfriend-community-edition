@@ -1,14 +1,17 @@
-import { User } from "@prisma/client";
+import { LobbyType, User } from "@prisma/client";
 import { ReactNode } from "react";
 
 export interface Lobby {
   id: string;
   title?: string;
+  description?: string;
   hostName: string;
   thumbnail: string;
-  viewers: number;
+  viewerCount: number;
   category?: string;
   isLive: boolean;
+  categories: string[];
+  type: LobbyType;
 }
 
 export interface LobbyViewProps {

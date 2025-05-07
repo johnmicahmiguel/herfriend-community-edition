@@ -20,6 +20,7 @@ import LobbyVideoOverlay from "@/components/lobby/LobbyVideoOverlay";
 import { useParams } from "next/navigation";
 import HostAvatarCircle from "@/components/lobby/HostAvatarCircle";
 import LobbyVoiceContent from "@/components/lobby/LobbyVoiceContent";
+import { getLobbyById } from "@/app/actions/lobby.action";
 
 // Mock data for Mission Center (replace with actual data fetching later)
 const mockDailyMissions: Mission[] = [
@@ -125,6 +126,8 @@ export default function LobbyPage() {
   const [showBookingNotification, setShowBookingNotification] = useState(false);
   const [nextBooking, setNextBooking] = useState(getNextUpcomingBooking());
   const [showVideoOverlay, setShowVideoOverlay] = useState(false);
+  const [lobby, setLobby] = useState<any>(null);
+  const [lobbyLoading, setLobbyLoading] = useState(true);
 
   const coHostRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
   const goalTooltipContainerRef = useRef<HTMLDivElement | null>(null);
@@ -326,14 +329,18 @@ export default function LobbyPage() {
 
   // Simulate changing speaker every few seconds (for demo purposes)
   React.useEffect(() => {
+    if (!lobby) return;
+    const speakers = [
+      lobby.host?.name,
+      ...(lobby.coHosts ? lobby.coHosts.map((host: any) => host.name) : [])
+    ].filter(Boolean);
+    if (speakers.length === 0) return;
     const interval = setInterval(() => {
-      const speakers = [lobbyData.hostName, ...lobbyData.cohosts.filter(host => host.online).map(host => host.name)];
       const randomIndex = Math.floor(Math.random() * speakers.length);
       setSpeakingUser(speakers[randomIndex]);
     }, 5000);
-    
     return () => clearInterval(interval);
-  }, [lobbyData]);
+  }, [lobby]);
 
   const handleCoHostClick = (hostId: string) => {
     setVisibleCoHostId(prevId => (prevId === hostId ? null : hostId));
@@ -376,8 +383,41 @@ export default function LobbyPage() {
     }
   }, [loading, user, isAnonymous]);
 
+  useEffect(() => {
+    async function fetchLobby() {
+      setLobbyLoading(true);
+      try {
+        const result = await getLobbyById(lobbyId);
+        setLobby(result);
+      } catch (e) {
+        setLobby(null);
+      } finally {
+        setLobbyLoading(false);
+      }
+    }
+    if (lobbyId) fetchLobby();
+  }, [lobbyId]);
+
+  // Loading state
+  if (lobbyLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <span className="text-lg text-gray-500 dark:text-gray-300">Loading lobby...</span>
+      </div>
+    );
+  }
+
+  // Not found state
+  if (!lobby) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <span className="text-lg text-red-500 dark:text-red-400">Lobby not found.</span>
+      </div>
+    );
+  }
+
   // VOICE LOBBY UI
-  if (lobbyId === "VOICE_LOBBY") {
+  if (lobby?.type === "VOICE_LOBBY") {
     return (
       <div className="flex flex-col md:flex-row overflow-hidden bg-gray-50 dark:bg-gray-900 relative">
         {/* Main content area */}
@@ -385,10 +425,20 @@ export default function LobbyPage() {
           {/* Voice Lobby Content */}
           <LobbyVoiceContent
             host={{
-              name: lobbyData.hostName,
-              avatar: lobbyData.hostAvatar,
+              uid: lobby.host?.uid || lobby.host?.id || '',
+              name: lobby.host?.name || '',
+              avatar: lobby.host?.avatar || lobby.host?.image || '',
             }}
-            cohosts={lobbyData.cohosts}
+            cohosts={
+              Array.isArray(lobby.coHosts)
+                ? lobby.coHosts.map((c: any) => ({
+                    uid: c.uid || c.id || c.user?.id || '',
+                    name: c.name || c.user?.name || '',
+                    avatar: c.avatar || c.user?.avatar || c.user?.image || '',
+                  }))
+                : []
+            }
+            speakingUser={speakingUser}
           />
           {/* Tabs (About, Past Videos) */}
           <div className="flex-1 flex flex-col overflow-hidden relative">
@@ -475,11 +525,11 @@ export default function LobbyPage() {
           <LobbyVideoPlayer />
           {showVideoOverlay && (
             <LobbyVideoOverlay
-              hostAvatar={lobbyData.hostAvatar}
-              hostName={lobbyData.hostName}
-              viewers={lobbyData.viewers}
-              title={lobbyData.title}
-              category={lobbyData.category}
+              hostAvatar={lobby.host?.avatar || lobby.host?.image || ''}
+              hostName={lobby.host?.name || ''}
+              viewers={lobby.viewers || 0}
+              title={lobby.title || ''}
+              category={lobby.category || ''}
               showGoalTooltip={showGoalTooltip}
               setShowGoalTooltip={setShowGoalTooltip}
               showPinnedTooltip={showPinnedTooltip}

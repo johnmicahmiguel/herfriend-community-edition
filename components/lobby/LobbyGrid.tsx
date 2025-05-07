@@ -6,88 +6,9 @@ import { Lobby } from "@/types/lobby";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import * as ScrollArea from "@radix-ui/react-scroll-area";
 
-// Dummy data for lobbies
-const DUMMY_LOBBIES: Lobby[] = [
-  {
-    id: "VIDEO_LOBBY",
-    title: "Social Experience with Nature",
-    hostName: "Nature",
-    thumbnail: "https://images.unsplash.com/photo-1519125323398-675f0ddb6308?q=80&w=1000",
-    viewers: 1245,
-    category: "Education",
-    isLive: true,
-  },
-  {
-    id: "VOICE_LOBBY",
-    title: "Clean Water Initiative",
-    hostName: "WASH Program",
-    thumbnail:
-      "https://images.unsplash.com/photo-1538300342682-cf57afb97285?q=80&w=1000",
-    viewers: 3782,
-    category: "Health",
-    isLive: true,
-  },
-  {
-    id: "3",
-    title: "Children's Rights Workshop",
-    hostName: "Rights Advocate",
-    thumbnail:
-      "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?q=80&w=1000",
-    viewers: 856,
-    category: "Rights",
-    isLive: true,
-  },
-  {
-    id: "4",
-    title: "Emergency Response Update",
-    hostName: "Humanitarian Aid",
-    thumbnail:
-      "https://images.unsplash.com/photo-1469571486292-0ba58a3f068b?q=80&w=1000",
-    viewers: 1024,
-    category: "Emergency",
-    isLive: false,
-  },
-  {
-    id: "5",
-    title: "Vaccination Campaign Live",
-    hostName: "Health Team",
-    thumbnail:
-      "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?q=80&w=1000",
-    viewers: 678,
-    category: "Health",
-    isLive: true,
-  },
-  {
-    id: "6",
-    title: "Youth Climate Action",
-    hostName: "Climate Change",
-    thumbnail:
-      "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?q=80&w=1000",
-    viewers: 2145,
-    category: "Environment",
-    isLive: false,
-  },
-  {
-    id: "7",
-    title: "Girls in Tech Program",
-    hostName: "Girls Empowerment",
-    thumbnail:
-      "https://images.unsplash.com/photo-1509062522246-3755977927d7?q=80&w=1000",
-    viewers: 932,
-    category: "Education",
-    isLive: true,
-  },
-  {
-    id: "8",
-    title: "Nutrition for Growth",
-    hostName: "Nutrition Team",
-    thumbnail:
-      "https://images.unsplash.com/photo-1490818387583-1baba5e638af?q=80&w=1000",
-    viewers: 1532,
-    category: "Health",
-    isLive: true,
-  },
-];
+interface LobbyGridProps {
+  lobbies: Lobby[];
+}
 
 // Memoized navigation button component
 const NavigationButton = memo(
@@ -119,7 +40,7 @@ const NavigationButton = memo(
 
 NavigationButton.displayName = "NavigationButton";
 
-function LobbyGrid() {
+function LobbyGrid({ lobbies }: LobbyGridProps) {
   const scrollViewportRef = useRef<HTMLDivElement>(null);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
 
@@ -294,7 +215,7 @@ function LobbyGrid() {
           style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
         >
           <div className="flex gap-4 py-4 px-2">
-            {DUMMY_LOBBIES.map((lobby) => (
+            {lobbies.map((lobby) => (
               <div key={lobby.id} className="flex-shrink-0 w-[336px]">
                 <LobbyCard lobby={lobby} preventNavigation={hasMoved} />
               </div>
