@@ -1,8 +1,10 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { MessageSearchProps, UserItemProps } from "@/types/messages";
+import { searchUsersAction } from "@/app/actions/user.action";
+import { useAuth } from "@/lib/context/auth.context";
 
 // Placeholder User Data
 const placeholderUsers: UserItemProps["user"][] = [
@@ -52,16 +54,51 @@ const UserItem: React.FC<UserItemProps> = ({ user, onSelect }) => {
 
 const MessageSearch: React.FC<MessageSearchProps> = ({ onSelectUser }) => {
   const [searchQuery, setSearchQuery] = useState("");
+  const [results, setResults] = useState<UserItemProps["user"][]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const { user } = useAuth();
 
-  // Basic handler, can be expanded later with actual search/debounce
-  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(event.target.value);
-    // In a real implementation, trigger search here (debounced)
-    console.log("Search query:", event.target.value);
-  };
-
-  // Determine if we should show placeholders (e.g., when query is empty or for demo)
-  const showPlaceholders = searchQuery.length < 3; // Example condition
+  // Debounce search
+  useEffect(() => {
+    if (searchQuery.length < 3) {
+      setResults([]);
+      setLoading(false);
+      setError(null);
+      return;
+    }
+    let active = true;
+    setLoading(true);
+    setError(null);
+    const timeout = setTimeout(async () => {
+      try {
+        const res = await searchUsersAction({
+          currentUserUid: user?.uid || "",
+          query: searchQuery,
+          page: 1,
+          limit: 10,
+        });
+        if (active) {
+          setResults(res.users.map((u: any) => ({
+            uid: u.uid,
+            name: u.username,
+            email: u.email,
+            profilePic: u.profilePic,
+          })));
+          setLoading(false);
+        }
+      } catch (e: any) {
+        if (active) {
+          setError(e.message || "Failed to search users");
+          setLoading(false);
+        }
+      }
+    }, 400);
+    return () => {
+      active = false;
+      clearTimeout(timeout);
+    };
+  }, [searchQuery, user?.uid]);
 
   return (
     <div className="flex flex-col gap-3">
@@ -69,7 +106,7 @@ const MessageSearch: React.FC<MessageSearchProps> = ({ onSelectUser }) => {
         <input
           type="search"
           value={searchQuery}
-          onChange={handleInputChange}
+          onChange={e => setSearchQuery(e.target.value)}
           className="w-full px-4 py-2 pl-10 border border-blue-100 dark:border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-blue-50 dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-400"
           placeholder="Search users by name or email..."
           aria-label="Search users"
@@ -80,20 +117,30 @@ const MessageSearch: React.FC<MessageSearchProps> = ({ onSelectUser }) => {
           </svg>
         </div>
       </div>
-
       <div className="space-y-1 bg-blue-50 dark:bg-gray-900 p-2 rounded-md">
-        {showPlaceholders && placeholderUsers.map((user) => (
+        {searchQuery.length < 3 && placeholderUsers.map((user) => (
           <UserItem
             key={user.uid}
             user={user}
             onSelect={onSelectUser}
           />
         ))}
-        {!showPlaceholders && (
-          <p className="text-sm text-gray-500 dark:text-gray-400 text-center p-4">
-            Searching...
-          </p>
+        {searchQuery.length >= 3 && loading && (
+          <p className="text-sm text-gray-500 dark:text-gray-400 text-center p-4">Searching...</p>
         )}
+        {searchQuery.length >= 3 && error && (
+          <p className="text-sm text-red-500 text-center p-4">{error}</p>
+        )}
+        {searchQuery.length >= 3 && !loading && !error && results.length === 0 && (
+          <p className="text-sm text-gray-500 dark:text-gray-400 text-center p-4">No users found.</p>
+        )}
+        {searchQuery.length >= 3 && !loading && !error && results.map((user) => (
+          <UserItem
+            key={user.uid}
+            user={user}
+            onSelect={onSelectUser}
+          />
+        ))}
       </div>
     </div>
   );

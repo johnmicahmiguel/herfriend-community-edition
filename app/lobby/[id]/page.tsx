@@ -308,14 +308,6 @@ export default function LobbyPage() {
     gifts: 345
   };
   
-  // Dummy data for chat messages
-  const chatMessages: ChatMessage[] = [
-    { id: "1", user: "Alex", message: "This is so informative!", avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=1000", time: "2 mins ago", level: 55, badge: "Ultimate Boss" },
-    { id: "2", user: "Sarah", message: "I love learning about nature!", avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=1000", time: "5 mins ago", level: 22, badge: "Most Loyal" },
-    { id: "3", user: "Michael", message: "Can you explain more about ecosystems?", avatar: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=1000", time: "7 mins ago", level: 8, badge: "Newbie" },
-    { id: "4", user: "HostJane", message: "Welcome everyone! Happy to answer questions.", avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=1000", time: "1 min ago", level: 32, badge: "Grinder" },
-  ];
-  
   // Dummy data for side bar
   const sideBarData = {
     gifters: [
@@ -427,7 +419,7 @@ export default function LobbyPage() {
         </div>
         {/* Right Sidebar (Top Users, Gifts, Missions, Chat) */}
         <div className="hidden md:block fixed top-16 right-0 h-[calc(100vh-64px)] w-96 bg-white dark:bg-gray-800 shadow-sm flex-col overflow-hidden border-l border-gray-200 dark:border-gray-700 z-30">
-          <LobbyRightSidebar topUsers={sideBarData} chatMessages={chatMessages} />
+          <LobbyRightSidebar topUsers={sideBarData} lobbyId={lobbyId} />
         </div>
         {/* Mobile sidebar */}
         {showMobileSidebar && (
@@ -523,7 +515,7 @@ export default function LobbyPage() {
 
       {/* Right Sidebar (Top Users, Gifts, Missions, Chat) */}
       <div className="hidden md:block md:w-96 bg-white dark:bg-gray-800 shadow-sm md:flex-col overflow-hidden border-l border-gray-200 dark:border-gray-700 fixed top-16 right-0 h-[calc(100vh-64px)]">
-        <LobbyRightSidebar topUsers={sideBarData} chatMessages={chatMessages} />
+        <LobbyRightSidebar topUsers={sideBarData} lobbyId={lobbyId} />
       </div>
 
       {/* Mobile sidebar */}
